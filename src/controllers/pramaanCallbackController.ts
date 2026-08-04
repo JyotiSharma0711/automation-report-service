@@ -81,25 +81,49 @@ export const pramaanCallbackController = async (
 
     let finalBase64Data = base64Data;
     // Inject script into the HTML report to hide PDF button and add HTML download button
-    if (typeof base64Data === 'string' && base64Data.includes('base64,')) {
+    if (typeof base64Data === 'string') {
       try {
-        const parts = base64Data.split('base64,');
-        const prefix = parts[0] + 'base64,';
-        const htmlContent = Buffer.from(parts[1], 'base64').toString('utf-8');
+        let prefix = '';
+        let htmlContent = '';
         
-        const injectionScript = `
+        if (base64Data.includes('base64,')) {
+          const parts = base64Data.split('base64,');
+          prefix = parts[0] + 'base64,';
+          htmlContent = Buffer.from(parts[1], 'base64').toString('utf-8');
+        } else {
+          // Try parsing it as raw base64
+          htmlContent = Buffer.from(base64Data, 'base64').toString('utf-8');
+        }
+        
+        // Ensure it looks like HTML before modifying
+        if (htmlContent && htmlContent.toLowerCase().includes('<html')) {
+          const injectionScript = `
 <script>
   window.addEventListener('DOMContentLoaded', () => {
-    // Hide 'Download PDF' button
-    const elements = document.querySelectorAll('button, a, div');
-    elements.forEach(el => {
-      const text = (el.innerText || el.textContent || '').toLowerCase();
-      if ((el.tagName === 'BUTTON' || el.tagName === 'A') && text.includes('pdf')) {
-        el.style.display = 'none';
-      }
-    });
+    function hidePdfButtons(doc) {
+      if (!doc) return;
+      const elements = doc.querySelectorAll('button, a, div');
+      elements.forEach(el => {
+        const text = (el.innerText || el.textContent || '').toLowerCase();
+        if ((el.tagName === 'BUTTON' || el.tagName === 'A') && text.includes('pdf')) {
+          el.style.display = 'none';
+        }
+      });
+    }
 
-    // Add 'Download HTML' button
+    // Hide in current document
+    hidePdfButtons(document);
+    
+    // Try to hide in parent document (if in an iframe and same origin)
+    try {
+      if (window.parent && window.parent.document) {
+        hidePdfButtons(window.parent.document);
+      }
+    } catch(e) {
+      // Cross-origin, ignore
+    }
+
+    // Add 'Download HTML' button inside the report
     const downloadBtn = document.createElement('button');
     downloadBtn.innerText = '⬇ Download HTML Report';
     downloadBtn.style.position = 'fixed';
@@ -130,16 +154,20 @@ export const pramaanCallbackController = async (
     document.body.appendChild(downloadBtn);
   });
 </script>`;
-        
-        let modifiedHtml = htmlContent;
-        if (modifiedHtml.includes('</body>')) {
-          modifiedHtml = modifiedHtml.replace('</body>', `${injectionScript}</body>`);
+          
+          let modifiedHtml = htmlContent;
+          if (modifiedHtml.includes('</body>')) {
+            modifiedHtml = modifiedHtml.replace('</body>', `${injectionScript}</body>`);
+          } else {
+            modifiedHtml += injectionScript;
+          }
+          
+          const encodedMod = Buffer.from(modifiedHtml, 'utf-8').toString('base64');
+          finalBase64Data = prefix ? prefix + encodedMod : encodedMod;
+          logger.info('Successfully injected HTML download script into Pramaan report.');
         } else {
-          modifiedHtml += injectionScript;
+          logger.info('base64Data does not appear to be HTML, skipping injection.');
         }
-        
-        finalBase64Data = prefix + Buffer.from(modifiedHtml, 'utf-8').toString('base64');
-        logger.info('Successfully injected HTML download script into Pramaan report.');
       } catch (err) {
         logger.error('Failed to inject HTML download script into Pramaan report', {}, err);
       }
