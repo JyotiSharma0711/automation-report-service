@@ -79,115 +79,11 @@ export const pramaanCallbackController = async (
       }
     }
 
-    let finalBase64Data = base64Data;
-    // Inject script into the HTML report to hide PDF button and add HTML download button
-    if (typeof base64Data === 'string') {
-      try {
-        let prefix = '';
-        let htmlContent = '';
-        let wasPlainHtml = false;
-        
-        const trimmedData = base64Data.trim();
-        if (trimmedData.toLowerCase().startsWith('<html') || trimmedData.toLowerCase().startsWith('<!doctype')) {
-          // It's already raw HTML!
-          htmlContent = base64Data;
-          wasPlainHtml = true;
-        } else if (base64Data.includes('base64,')) {
-          const parts = base64Data.split('base64,');
-          prefix = parts[0] + 'base64,';
-          htmlContent = Buffer.from(parts[1], 'base64').toString('utf-8');
-        } else {
-          // Try parsing it as raw base64
-          htmlContent = Buffer.from(base64Data, 'base64').toString('utf-8');
-        }
-        
-        // Ensure it looks like HTML before modifying
-        if (htmlContent && htmlContent.toLowerCase().includes('<html')) {
-          const injectionScript = `
-<script>
-  window.addEventListener('DOMContentLoaded', () => {
-    function hidePdfButtons(doc) {
-      if (!doc) return;
-      const elements = doc.querySelectorAll('button, a, div');
-      elements.forEach(el => {
-        const text = (el.innerText || el.textContent || '').toLowerCase();
-        if ((el.tagName === 'BUTTON' || el.tagName === 'A') && text.includes('pdf')) {
-          el.style.display = 'none';
-        }
-      });
-    }
-
-    // Hide in current document
-    hidePdfButtons(document);
-    
-    // Try to hide in parent document (if in an iframe and same origin)
-    try {
-      if (window.parent && window.parent.document) {
-        hidePdfButtons(window.parent.document);
-      }
-    } catch(e) {
-      // Cross-origin, ignore
-    }
-
-    // Add 'Download HTML' button inside the report
-    const downloadBtn = document.createElement('button');
-    downloadBtn.innerText = '⬇ Download HTML Report';
-    downloadBtn.style.position = 'fixed';
-    downloadBtn.style.top = '15px';
-    downloadBtn.style.right = '15px';
-    downloadBtn.style.zIndex = '999999';
-    downloadBtn.style.padding = '8px 16px';
-    downloadBtn.style.backgroundColor = '#0056a6';
-    downloadBtn.style.color = '#fff';
-    downloadBtn.style.border = 'none';
-    downloadBtn.style.borderRadius = '4px';
-    downloadBtn.style.cursor = 'pointer';
-    downloadBtn.style.fontWeight = 'bold';
-    downloadBtn.onclick = function() {
-      downloadBtn.style.display = 'none';
-      const currentHtml = document.documentElement.outerHTML;
-      const blob = new Blob([currentHtml], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Pramaan_Report.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      downloadBtn.style.display = 'block';
-    };
-    document.body.appendChild(downloadBtn);
-  });
-</script>`;
-          
-          let modifiedHtml = htmlContent;
-          if (modifiedHtml.includes('</body>')) {
-            modifiedHtml = modifiedHtml.replace('</body>', `${injectionScript}</body>`);
-          } else {
-            modifiedHtml += injectionScript;
-          }
-          
-          if (wasPlainHtml) {
-            finalBase64Data = modifiedHtml;
-          } else {
-            const encodedMod = Buffer.from(modifiedHtml, 'utf-8').toString('base64');
-            finalBase64Data = prefix ? prefix + encodedMod : encodedMod;
-          }
-          logger.info('Successfully injected HTML download script into Pramaan report.');
-        } else {
-          logger.info('base64Data does not appear to be HTML, skipping injection.');
-        }
-      } catch (err) {
-        logger.error('Failed to inject HTML download script into Pramaan report', {}, err);
-      }
-    }
-
     const reportUrl = `${automationDbUrl}/report/${testId}`;
     const response = await axios.post(
       reportUrl,
       {
-        data: finalBase64Data,
+        data: base64Data,
         ...(flow_summary && { flow_summary }),
       },
       {
