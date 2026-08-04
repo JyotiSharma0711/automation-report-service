@@ -79,11 +79,77 @@ export const pramaanCallbackController = async (
       }
     }
 
+    let finalBase64Data = base64Data;
+    // Inject script into the HTML report to hide PDF button and add HTML download button
+    if (typeof base64Data === 'string' && base64Data.includes('base64,')) {
+      try {
+        const parts = base64Data.split('base64,');
+        const prefix = parts[0] + 'base64,';
+        const htmlContent = Buffer.from(parts[1], 'base64').toString('utf-8');
+        
+        const injectionScript = `
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    // Hide 'Download PDF' button
+    const elements = document.querySelectorAll('button, a, div');
+    elements.forEach(el => {
+      const text = (el.innerText || el.textContent || '').toLowerCase();
+      if ((el.tagName === 'BUTTON' || el.tagName === 'A') && text.includes('pdf')) {
+        el.style.display = 'none';
+      }
+    });
+
+    // Add 'Download HTML' button
+    const downloadBtn = document.createElement('button');
+    downloadBtn.innerText = '⬇ Download HTML Report';
+    downloadBtn.style.position = 'fixed';
+    downloadBtn.style.top = '15px';
+    downloadBtn.style.right = '15px';
+    downloadBtn.style.zIndex = '999999';
+    downloadBtn.style.padding = '8px 16px';
+    downloadBtn.style.backgroundColor = '#0056a6';
+    downloadBtn.style.color = '#fff';
+    downloadBtn.style.border = 'none';
+    downloadBtn.style.borderRadius = '4px';
+    downloadBtn.style.cursor = 'pointer';
+    downloadBtn.style.fontWeight = 'bold';
+    downloadBtn.onclick = function() {
+      downloadBtn.style.display = 'none';
+      const currentHtml = document.documentElement.outerHTML;
+      const blob = new Blob([currentHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Pramaan_Report.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      downloadBtn.style.display = 'block';
+    };
+    document.body.appendChild(downloadBtn);
+  });
+</script>`;
+        
+        let modifiedHtml = htmlContent;
+        if (modifiedHtml.includes('</body>')) {
+          modifiedHtml = modifiedHtml.replace('</body>', `${injectionScript}</body>`);
+        } else {
+          modifiedHtml += injectionScript;
+        }
+        
+        finalBase64Data = prefix + Buffer.from(modifiedHtml, 'utf-8').toString('base64');
+        logger.info('Successfully injected HTML download script into Pramaan report.');
+      } catch (err) {
+        logger.error('Failed to inject HTML download script into Pramaan report', {}, err);
+      }
+    }
+
     const reportUrl = `${automationDbUrl}/report/${testId}`;
     const response = await axios.post(
       reportUrl,
       {
-        data: base64Data,
+        data: finalBase64Data,
         ...(flow_summary && { flow_summary }),
       },
       {
