@@ -85,8 +85,14 @@ export const pramaanCallbackController = async (
       try {
         let prefix = '';
         let htmlContent = '';
+        let wasPlainHtml = false;
         
-        if (base64Data.includes('base64,')) {
+        const trimmedData = base64Data.trim();
+        if (trimmedData.toLowerCase().startsWith('<html') || trimmedData.toLowerCase().startsWith('<!doctype')) {
+          // It's already raw HTML!
+          htmlContent = base64Data;
+          wasPlainHtml = true;
+        } else if (base64Data.includes('base64,')) {
           const parts = base64Data.split('base64,');
           prefix = parts[0] + 'base64,';
           htmlContent = Buffer.from(parts[1], 'base64').toString('utf-8');
@@ -162,8 +168,12 @@ export const pramaanCallbackController = async (
             modifiedHtml += injectionScript;
           }
           
-          const encodedMod = Buffer.from(modifiedHtml, 'utf-8').toString('base64');
-          finalBase64Data = prefix ? prefix + encodedMod : encodedMod;
+          if (wasPlainHtml) {
+            finalBase64Data = modifiedHtml;
+          } else {
+            const encodedMod = Buffer.from(modifiedHtml, 'utf-8').toString('base64');
+            finalBase64Data = prefix ? prefix + encodedMod : encodedMod;
+          }
           logger.info('Successfully injected HTML download script into Pramaan report.');
         } else {
           logger.info('base64Data does not appear to be HTML, skipping injection.');
