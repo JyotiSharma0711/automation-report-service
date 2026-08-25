@@ -12,6 +12,6 @@
       "allowSyntheticDefaultImports": true
   
     },
-    "include": ["src/**/*", "src/**/*.yaml", "src/config/validationConfig.yaml"],
+    "include": ["src/**/*", "src/**/*.yaml"],
     "exclude": ["node_modules", "dist"]
   }

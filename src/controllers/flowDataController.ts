@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import axios from "axios";
 import logger from "@ondc/automation-logger";
 import { ENABLED_DOMAINS } from "../utils/constants";
+import { MESSAGES } from "../utils/messages";
 
 const PRAMAAN_ANALYTICS_URL = "https://pramaan.ondc.org/beta/analytics-api/fetch-flow-data/";
 
@@ -27,7 +28,7 @@ export async function fetchFlowDataController(
     if (!subscriberId || !domain || !version) {
       res.status(400).json({
         error: true,
-        message: "subscriberId, domain and version are required",
+        message: MESSAGES.flowData.missingRequiredFields,
       });
       return;
     }
@@ -36,7 +37,7 @@ export async function fetchFlowDataController(
     const domainVersionKey = `${domain}:${version}`;
     const isEnabled = (ENABLED_DOMAINS as string[]).includes(domainVersionKey);
 
-    logger.info("fetchFlowData: checking domain", { domainVersionKey, isEnabled });
+    logger.info(MESSAGES.flowData.checkingDomain, { domainVersionKey, isEnabled });
 
     if (isEnabled) {
       // Internal workbench flow — handler to be built later
@@ -44,7 +45,7 @@ export async function fetchFlowDataController(
         source: "internal",
         enabled: true,
         domainVersionKey,
-        message: "This domain/version has an internal workbench flow.",
+        message: MESSAGES.flowData.internalWorkbenchFlowMessage,
       });
       return;
     }
@@ -57,7 +58,7 @@ export async function fetchFlowDataController(
       type: npType === "BPP" ? "Seller" : "Buyer",
     };
 
-    logger.info("Fetching flow data from Pramaan", {
+    logger.info(MESSAGES.flowData.fetchingFromPramaan, {
       subscriberId,
       domain,
       version,
@@ -84,7 +85,7 @@ export async function fetchFlowDataController(
     });
   } catch (err: any) {
     const status = err?.response?.status;
-    logger.error("fetchFlowData: error", { body: req.body, error: err?.message });
+    logger.error(MESSAGES.flowData.fetchError, { body: req.body, error: err?.message });
     res
       .status(status || 500)
       .json(err?.response?.data || { error: true, message: err?.message });

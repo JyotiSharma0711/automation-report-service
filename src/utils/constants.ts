@@ -277,10 +277,14 @@ type FlowCodeRequirement = {
   code: string;
 };
 
-export function validateLSPFeaturesForFlows(
+// Shared by validateLSPFeaturesForFlows/validateLBNPFeaturesForFlows: once the
+// relevant feature tag has been looked up (each caller does its own lookup,
+// since they differ in whether a missing tag list is tolerated), this checks
+// that every required code for the current flow is present with value "yes".
+function hasAllRequiredFeatureCodes(
   currentFlowId: string,
   requirements: FlowCodeRequirement[],
-  catalogTags: Tag[]
+  featureTag: Tag | undefined
 ): boolean {
   // Filter requirements that apply to the current flow
   const relevantRequirements = requirements.filter(
@@ -292,18 +296,26 @@ export function validateLSPFeaturesForFlows(
     return true;
   }
 
-  // Get the lsp_features tag
-  const lspFeaturesTag = catalogTags.find((tag) => tag.code === "lsp_features");
-  if (!lspFeaturesTag || !Array.isArray(lspFeaturesTag.list)) {
+  if (!featureTag || !Array.isArray(featureTag.list)) {
     return false;
   }
 
   // Check that all required codes exist with value "yes"
   return relevantRequirements.every((req) =>
-    lspFeaturesTag.list.some(
+    featureTag.list.some(
       (item) => item.code === req.code && item.value.toLowerCase() === "yes"
     )
   );
+}
+
+export function validateLSPFeaturesForFlows(
+  currentFlowId: string,
+  requirements: FlowCodeRequirement[],
+  catalogTags: Tag[]
+): boolean {
+  // Get the lsp_features tag
+  const lspFeaturesTag = catalogTags.find((tag) => tag.code === "lsp_features");
+  return hasAllRequiredFeatureCodes(currentFlowId, requirements, lspFeaturesTag);
 }
 
 export function validateLBNPFeaturesForFlows(
@@ -311,30 +323,11 @@ export function validateLBNPFeaturesForFlows(
   requirements: FlowCodeRequirement[],
   intentTags: Tag[]
 ): boolean {
-  // Filter requirements that apply to the current flow
-  const relevantRequirements = requirements.filter(
-    (req) => req.flowId === currentFlowId
-  );
-
-  // If no relevant rules exist for this flowId, it's valid
-  if (relevantRequirements.length === 0) {
-    return true;
-  }
-
-  // Get the lsp_features tag
+  // Get the lbnp_features tag
   const lbnpFeaturesTag = intentTags?.find(
     (tag) => tag.code === "lbnp_features"
   );
-  if (!lbnpFeaturesTag || !Array.isArray(lbnpFeaturesTag.list)) {
-    return false;
-  }
-
-  // Check that all required codes exist with value "yes"
-  return relevantRequirements.every((req) =>
-    lbnpFeaturesTag.list.some(
-      (item) => item.code === req.code && item.value.toLowerCase() === "yes"
-    )
-  );
+  return hasAllRequiredFeatureCodes(currentFlowId, requirements, lbnpFeaturesTag);
 }
 export const rules = [
   { flowId: "CASH_ON_DELIVERY_FLOW", code: "008" },

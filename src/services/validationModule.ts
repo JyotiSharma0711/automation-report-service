@@ -194,8 +194,6 @@ function validateActionSequence(
       }
 
       // Check if we have enough payloads
-      console.log("payloadIndex", payloadIndex);
-      console.log("validationPayloads.length", validationPayloads.length);
       if (payloadIndex >= validationPayloads.length) {
         validSequence = false;
         // Check for Early Success Termination

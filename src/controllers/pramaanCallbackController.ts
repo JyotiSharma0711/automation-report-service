@@ -4,6 +4,7 @@ import logger from "@ondc/automation-logger";
 import { CacheService } from "../services/cacheService";
 import { fetchSessionDetails } from "../services/dbService";
 import { FLOW_ID_MAP } from "../utils/constants";
+import { MESSAGES } from "../utils/messages";
 
 // A mochawesome suite (one per Pramaan flow_id, tagged via `result.title`) is
 // considered failed if any of its tests — or any nested suite's tests — failed.
@@ -53,13 +54,13 @@ export const pramaanCallbackController = async (
 
     if (!base64Data) {
       logger.error(`Missing data in callback for testId: ${testId}`);
-      res.status(400).json({ error: "Missing data in callback" });
+      res.status(400).json({ error: MESSAGES.callback.missingData });
       return;
     }
 
     const automationDbUrl = process.env.DATA_BASE_URL;
     if (!automationDbUrl) {
-      throw new Error("DATA_BASE_URL not defined in environment variables");
+      throw new Error(MESSAGES.callback.dataBaseUrlNotConfigured);
     }
 
     // Prefer flow_summary sent inline in the callback body (Pramaan buyer path).
@@ -131,7 +132,7 @@ export const pramaanCallbackController = async (
       logger.error(`Failed to derive/save Pramaan flowMap for testId: ${testId}`, {}, err);
     }
 
-    res.status(200).json({ message: "Report forwarded successfully" });
+    res.status(200).json({ message: MESSAGES.callback.reportForwardedSuccessfully });
   } catch (err: any) {
     logger.error(
       `Error forwarding callback for testId: ${req.params.testId}`,
