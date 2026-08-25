@@ -1,10 +1,8 @@
 import { TestResult, Payload } from "../../../types/payload";
 import { DomainValidators } from "../../shared/domainValidator";
-import { validateFIS12LoanQuote } from "../../shared/quoteValidations";
 import { saveFromElement } from "../../../utils/specLoader";
 import { getActionData } from "../../../services/actionDataService";
 import { validateFormIdIfXinputPresent } from "../../shared/formValidations";
-import { PURCHASE_FINANCE_FLOWS } from "../../../utils/constants";
 
 export default async function on_init(
   element: Payload,
@@ -19,11 +17,11 @@ export default async function on_init(
     const message = element?.jsonRequest?.message;
     // pramaan-validation-parity skill: generic quote-arithmetic call removed here — now runs
     // universally for every domain via flowContinuityValidators.ts's checkFlowContinuity() (see
-    // that file, and OnSelect.ts in this same folder for the full explanation). FIS12's
-    // loan-quote formula check (previously dead code — never called anywhere) wired in instead.
-    if (message?.order?.quote && flowId && PURCHASE_FINANCE_FLOWS.includes(flowId)) {
-      validateFIS12LoanQuote(message, result);
-    }
+    // that file). FIS12's loan-quote formula check (validateFIS12LoanQuote) was briefly wired in
+    // here, then disabled again 2026-08-25 at the user's explicit request — quote validation
+    // kept to just the common breakup-total check for now, not domain-specific ones. The
+    // function itself is untouched in quoteValidations.ts; re-add the import, the
+    // PURCHASE_FINANCE_FLOWS import, and a guarded call here to re-enable it.
 
     const txnId = element?.jsonRequest?.context?.transaction_id as string | undefined;
     if (txnId) {
