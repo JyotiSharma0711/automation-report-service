@@ -5589,6 +5589,7 @@ export function validateCancel(
       "012",
       "013",
       "014",
+      "05"
     ];
     if (validReasonCodes.includes(message.cancellation_reason_id)) {
       testResults.passed.push("Cancellation reason ID has valid value");
