@@ -18,10 +18,22 @@ export const saveFlowData = async (
   value: Record<string, any> // Accept JSON object
 ): Promise<void> => {
   try {
-    // Create a unique key in the format sessionId:transactionId:key
+    // pramaan-validation-parity skill: key scoping fixed 2026-08-25 — see gap-patterns.md.
+    // search/on_search are scoped by (sessionId, flowId) only, NOT transactionId. Some BAP/BPP
+    // pairs issue a fresh transaction_id per search round within the same flow (refine-and-
+    // research before select), so a transaction-scoped key silently "loses" earlier rounds'
+    // data the moment a later round's transaction_id differs — this was the root cause of a
+    // reported false failure ("Form ID ... not found in any previous action. Checked: on_search
+    // (no data found)") in select.ts's `getActionData(sessionID, flowId, txnId, "on_search")`
+    // call. Every write to this key OVERWRITES the previous one, so a flow-scoped key also means
+    // "latest on_search wins" for anything read back from it — consistent with the same
+    // latest-on_search philosophy already applied in flowContinuityValidators.ts's
+    // checkOrderTrailAgainstOnSearch. Every other action keeps transactionId in its key: FIS12's
+    // select/init/confirm/etc. only ever run once per transaction within a flow, so there's no
+    // equivalent multi-round collision for them.
     const redisKey =
       key === "on_search" || key === "search"
-        ? `${sessionId}:${transactionId}:${key}`
+        ? `${sessionId}:${flowId}:${key}`
         : `${sessionId}:${flowId}:${transactionId}:${key}`;
 
     // Serialize the JSON object to a string
@@ -45,9 +57,10 @@ export const fetchFlowData = async (
   key: string
 ): Promise<Record<string, any> | null> => {
   try {
+    // See the matching comment in saveFlowData above — this must mirror that key exactly.
     const redisKey =
       key === "on_search" || key === "search"
-        ? `${sessionId}:${transactionId}:${key}`
+        ? `${sessionId}:${flowId}:${key}`
         : `${sessionId}:${flowId}:${transactionId}:${key}`;
 
 
