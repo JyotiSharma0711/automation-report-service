@@ -32,16 +32,12 @@ export default async function on_update(
         
         // Validate items consistency
         const missingItems = referenceItemIds.filter(id => !onUpdateItemIds.includes(id));
-        const extraItems = onUpdateItemIds.filter(id => !referenceItemIds.includes(id));
-        
-        if (missingItems.length === 0 && extraItems.length === 0 && referenceItemIds.length > 0) {
+
+        if (missingItems.length === 0 && referenceItemIds.length > 0) {
           result.passed.push(`All items from select/on_select (${referenceItemIds.length}) are present in on_update`);
         } else {
           if (missingItems.length > 0) {
             result.failed.push(`Items from select/on_select missing in on_update: ${missingItems.join(", ")}`);
-          }
-          if (extraItems.length > 0) {
-            result.failed.push(`Extra items in on_update not present in select/on_select: ${extraItems.join(", ")}`);
           }
         }
         

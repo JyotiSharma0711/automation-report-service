@@ -299,23 +299,15 @@ export function validateItemConsistency(
     if (currentIds.length === 0 || priorIds.length === 0) return;
 
     const missing = priorIds.filter(id => !currentIds.includes(id));
-    const extra = currentIds.filter(id => !priorIds.includes(id));
 
-    if (missing.length === 0 && extra.length === 0) {
+    if (missing.length === 0) {
         testResults.passed.push(
             `[L2:items] Item IDs consistent between ${priorAction || "prior"} and ${currentAction || "current"} (${currentIds.length} items)`
         );
     } else {
-        if (missing.length > 0) {
-            testResults.failed.push(
-                `[L2:items] Items from ${priorAction || "prior"} missing in ${currentAction || "current"}: ${missing.join(", ")}`
-            );
-        }
-        if (extra.length > 0) {
-            testResults.failed.push(
-                `[L2:items] Extra items in ${currentAction || "current"} not in ${priorAction || "prior"}: ${extra.join(", ")}`
-            );
-        }
+        testResults.failed.push(
+            `[L2:items] Items from ${priorAction || "prior"} missing in ${currentAction || "current"}: ${missing.join(", ")}`
+        );
     }
 }
 

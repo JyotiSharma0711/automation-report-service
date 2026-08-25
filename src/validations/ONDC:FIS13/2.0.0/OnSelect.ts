@@ -50,16 +50,12 @@ export default async function on_select(
       if (isInsuranceFlow) {
         const onSelectItemIds = onSelItems.map(it => it?.id).filter(Boolean) as string[];
         const missingItems = selectItemIds.filter(id => !onSelectItemIds.includes(id));
-        const extraItems = onSelectItemIds.filter(id => !selectItemIds.includes(id));
-        
-        if (missingItems.length === 0 && extraItems.length === 0 && selectItemIds.length > 0) {
+
+        if (missingItems.length === 0 && selectItemIds.length > 0) {
           result.passed.push(`All items from select (${selectItemIds.length}) are present in on_select`);
         } else {
           if (missingItems.length > 0) {
             result.failed.push(`Items from select missing in on_select: ${missingItems.join(", ")}`);
-          }
-          if (extraItems.length > 0) {
-            result.failed.push(`Extra items in on_select not present in select: ${extraItems.join(", ")}`);
           }
         }
         

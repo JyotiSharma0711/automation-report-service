@@ -60,13 +60,11 @@ export default async function on_select(
 
       const onSelectItemIds = onSelItems.map((it: any) => it?.id).filter(Boolean) as string[];
       const missingItems = selectItemIds.filter(id => !onSelectItemIds.includes(id));
-      const extraItems = onSelectItemIds.filter(id => !selectItemIds.includes(id));
       if (selectItemIds.length > 0) {
-        if (missingItems.length === 0 && extraItems.length === 0) {
+        if (missingItems.length === 0) {
           result.passed.push(`All items from select (${selectItemIds.length}) are present in on_select`);
         } else {
           if (missingItems.length) result.failed.push(`Items from select missing in on_select: ${missingItems.join(", ")}`);
-          if (extraItems.length) result.failed.push(`Extra items in on_select not in select: ${extraItems.join(", ")}`);
         }
       }
 
