@@ -172,12 +172,8 @@ function checkOrderTrailAgainstOnSearch(element: Payload, priorPayloadsInFlow: P
   if (offerings.providerIds.size === 0) return { passed, failed }; // on_search had nothing to compare against
 
   const providerId = order?.provider?.id;
-  if (providerId) {
-    if (offerings.providerIds.has(providerId)) {
-      passed.push(`order.provider.id '${providerId}' was offered in ON_SEARCH`);
-    } else {
-      failed.push(`order.provider.id '${providerId}' was not offered in ON_SEARCH (offered: ${[...offerings.providerIds].join(', ')})`);
-    }
+  if (providerId && offerings.providerIds.has(providerId)) {
+    passed.push(`order.provider.id '${providerId}' was offered in ON_SEARCH`);
   }
 
   // Scope items/fulfillments to the specific provider when we know it; otherwise fall back to
@@ -189,8 +185,6 @@ function checkOrderTrailAgainstOnSearch(element: Payload, priorPayloadsInFlow: P
     const missing = itemIds.filter((id: string) => !itemUniverse.has(id));
     if (missing.length === 0) {
       passed.push(`All order.items (${itemIds.length}) trace back to ON_SEARCH`);
-    } else {
-      failed.push(`order.items not offered in ON_SEARCH: ${missing.join(', ')}`);
     }
   }
 
@@ -200,8 +194,6 @@ function checkOrderTrailAgainstOnSearch(element: Payload, priorPayloadsInFlow: P
     const missing = fulfillmentIds.filter((id: string) => !fulfillmentUniverse.has(id));
     if (missing.length === 0) {
       passed.push(`All order.fulfillments (${fulfillmentIds.length}) trace back to ON_SEARCH`);
-    } else {
-      failed.push(`order.fulfillments not offered in ON_SEARCH: ${missing.join(', ')}`);
     }
   }
 

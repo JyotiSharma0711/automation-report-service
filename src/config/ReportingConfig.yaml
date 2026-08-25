@@ -4324,42 +4324,149 @@ domains:
               Health_Insurance_Application(Individual):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
+
+              Health_Insurance_Application(Individual_With_IGM):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+                - DYNAMIC_FORM
+                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
 
               Health_Insurance_Application(PRE-ORDER-Individual):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+
+              Health_Insurance_Application(PRE-ORDER-Individual-With-ManualReview):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+
+              Health_Insurance_Application(PRE-ORDER-Individual-Without-CIS):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
@@ -4367,24 +4474,35 @@ domains:
               Claim_Health_Insurance(Individual):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
+                - DYNAMIC_FORM
                 - on_update
                 - on_update
                 - on_status
@@ -4393,24 +4511,36 @@ domains:
               Renew_Health_Insurance(Individual):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
+                - on_update
+                - DYNAMIC_FORM
                 - on_update
                 - on_status
                 - on_update
@@ -4418,67 +4548,248 @@ domains:
               Cancel_Health_Insurance(Individual):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
                 - cancel
                 - on_cancel
                 - on_update
 
-              Health_Insurance_Application(Family):
+              Payment_Failure_Health_Insurance(Individual):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
+                - update
+                - on_update
+
+              Payment_Failure_Health_Insurance(PRE-ORDER-Individual-With-ManualReview):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+
+              Health_Insurance_Application(Family):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+                - DYNAMIC_FORM
+                - on_update
+
+              Health_Insurance_Application(Family_With_IGM):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+                - DYNAMIC_FORM
+                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
 
               Health_Insurance_Application(PRE-ORDER-Family):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+
+              Health_Insurance_Application(PRE-ORDER-Family-With-ManualReview):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+
+              Health_Insurance_Application(PRE-ORDER-Family-Without-CIS):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
@@ -4486,24 +4797,35 @@ domains:
               Claim_Health_Insurance(Family):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
+                - DYNAMIC_FORM
                 - on_update
                 - on_update
                 - on_status
@@ -4512,24 +4834,36 @@ domains:
               Renew_Health_Insurance(Family):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
+                - on_update
+                - DYNAMIC_FORM
                 - on_update
                 - on_status
                 - on_update
@@ -4537,30 +4871,122 @@ domains:
               Cancel_Health_Insurance(Family):
                 - search
                 - on_search
+                - HTML_FORM
                 - search
                 - on_search
                 - select
                 - on_select
-                - on_status
+                - HTML_FORM
                 - select
                 - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - HTML_FORM
                 - init
                 - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
                 - cancel
                 - on_cancel
                 - on_update
+
+              Payment_Failure_Health_Insurance(Family):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+                - DYNAMIC_FORM
+                - on_update
+                - update
+                - on_update
+
+              Payment_Failure_Health_Insurance(PRE-ORDER-Family-With-ManualReview):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
             optional_flows:
+              - Health_Insurance_Application(Individual)
+              - Health_Insurance_Application(Individual_With_IGM)
               - Health_Insurance_Application(PRE-ORDER-Individual)
+              - Health_Insurance_Application(PRE-ORDER-Individual-With-ManualReview)
+              - Health_Insurance_Application(PRE-ORDER-Individual-Without-CIS)
+              - Claim_Health_Insurance(Individual)
+              - Renew_Health_Insurance(Individual)
+              - Cancel_Health_Insurance(Individual)
+              - Payment_Failure_Health_Insurance(Individual)
+              - Payment_Failure_Health_Insurance(PRE-ORDER-Individual-With-ManualReview)
+              - Health_Insurance_Application(Family)
+              - Health_Insurance_Application(Family_With_IGM)
               - Health_Insurance_Application(PRE-ORDER-Family)
+              - Health_Insurance_Application(PRE-ORDER-Family-With-ManualReview)
+              - Health_Insurance_Application(PRE-ORDER-Family-Without-CIS)
+              - Claim_Health_Insurance(Family)
+              - Renew_Health_Insurance(Family)
+              - Cancel_Health_Insurance(Family)
+              - Payment_Failure_Health_Insurance(Family)
+              - Payment_Failure_Health_Insurance(PRE-ORDER-Family-With-ManualReview)
             validationModules: "../validations/ONDC:FIS13/validator#validate"
 
           MOTOR INSURANCE:
@@ -4575,7 +5001,37 @@ domains:
                 - on_select
                 - DYNAMIC_FORM
                 - on_status
-                - status
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+                - DYNAMIC_FORM
+                - on_update
+
+              Motor_Insurance_Application(With_IGM):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - select
                 - on_select
@@ -4596,9 +5052,12 @@ domains:
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
-                - update
-                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
 
               Motor_Insurance_Application(PRE-ORDER):
                 - search
@@ -4609,8 +5068,6 @@ domains:
                 - select
                 - on_select
                 - DYNAMIC_FORM
-                - on_status
-                - status
                 - on_status
                 - select
                 - on_select
@@ -4642,8 +5099,6 @@ domains:
                 - on_select
                 - DYNAMIC_FORM
                 - on_status
-                - status
-                - on_status
                 - select
                 - on_select
                 - HTML_FORM
@@ -4663,7 +5118,9 @@ domains:
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
+                - DYNAMIC_FORM
                 - on_update
                 - on_update
                 - on_status
@@ -4679,7 +5136,40 @@ domains:
                 - on_select
                 - DYNAMIC_FORM
                 - on_status
-                - status
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - confirm
+                - on_confirm
+                - DYNAMIC_FORM
+                - on_update
+                - cancel
+                - on_cancel
+                - on_update
+
+              Payment_Failure_Motor_Insurance:
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - DYNAMIC_FORM
                 - on_status
                 - select
                 - on_select
@@ -4700,12 +5190,48 @@ domains:
                 - on_status
                 - confirm
                 - on_confirm
+                - DYNAMIC_FORM
                 - on_update
-                - cancel
-                - on_cancel
+                - update
                 - on_update
+
+              Payment_Failure_Motor_Insurance(PRE-ORDER):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - HTML_FORM
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
             optional_flows:
+              - Motor_Insurance_Application
+              - Motor_Insurance_Application(With_IGM)
               - Motor_Insurance_Application(PRE-ORDER)
+              - Claim_Motor_Insurance
+              - Cancel_Motor_Insurance
+              - Payment_Failure_Motor_Insurance
+              - Payment_Failure_Motor_Insurance(PRE-ORDER)
             validationModules: "../validations/ONDC:FIS13/validator#validate"
       
   ONDC:TRV13:

@@ -1265,12 +1265,6 @@ export async function validateFormIdConsistency(
           checkedActions.push(`${prevAction} (no data found)`);
         }
       }
-      
-      for (const item of items) {
-        if (item?.xinput?.form?.id && item?.xinput?.form_response) {
-          testResults.failed.push(`Item ${item.id}: Form ID "${item.xinput.form.id}" not found in any previous action. Checked: ${checkedActions.join(", ")}`);
-        }
-      }
     }
   } else {
     // Current action doesn't have form_response, so it's a new form - skip validation

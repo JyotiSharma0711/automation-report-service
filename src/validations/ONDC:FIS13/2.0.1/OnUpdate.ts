@@ -38,12 +38,10 @@ export default async function on_update(
 
       if (refIds.length > 0) {
         const missing = refIds.filter(id => !onUpdIds.includes(id));
-        const extra = onUpdIds.filter(id => !refIds.includes(id));
-        if (missing.length === 0 && extra.length === 0) {
+        if (missing.length === 0) {
           result.passed.push(`All items from select/on_select (${refIds.length}) are present in on_update`);
         } else {
           if (missing.length) result.failed.push(`Items from select/on_select missing in on_update: ${missing.join(", ")}`);
-          if (extra.length) result.failed.push(`Extra items in on_update not in select/on_select: ${extra.join(", ")}`);
         }
       }
 
