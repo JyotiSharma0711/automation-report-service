@@ -7,8 +7,6 @@ import {
   formatDate,
   extractTATHours,
   getTimestampFromDuration,
-  validateRequiredField,
-  validateArrayContains,
   addDefaultValidationMessage,
 } from "./commonValidations";
 
