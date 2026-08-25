@@ -1,10 +1,11 @@
 import { TestResult, Payload } from "../../../types/payload";
 import { DomainValidators } from "../../shared/domainValidator";
-import { validateOrderQuote } from "../../shared/quoteValidations";
+import { validateFIS12LoanQuote } from "../../shared/quoteValidations";
 import { getActionData } from "../../../services/actionDataService";
 import { validateErrorResponse } from "../../shared/validationFactory";
 import { validateFormIdIfXinputPresent } from "../../shared/formValidations";
 import { saveFromElement } from "../../../utils/specLoader";
+import { PURCHASE_FINANCE_FLOWS } from "../../../utils/constants";
 
 export default async function on_confirm(
   element: Payload,
@@ -20,14 +21,12 @@ export default async function on_confirm(
 
   try {
     const message = element?.jsonRequest?.message;
-    if (message?.order?.quote) {
-      validateOrderQuote(message, result, {
-        validateDecimalPlaces: true,
-        validateTotalMatch: true,
-        // For TRV10, item price consistency is optional
-        validateItemPriceConsistency: false,
-        flowId,
-      });
+    // pramaan-validation-parity skill: generic quote-arithmetic call removed here — now runs
+    // universally for every domain via flowContinuityValidators.ts's checkFlowContinuity() (see
+    // that file, and OnSelect.ts in this same folder for the full explanation). FIS12's
+    // loan-quote formula check (previously dead code — never called anywhere) wired in instead.
+    if (message?.order?.quote && flowId && PURCHASE_FINANCE_FLOWS.includes(flowId)) {
+      validateFIS12LoanQuote(message, result);
     }
 
     // Compare against CONFIRM request when available
