@@ -56,7 +56,13 @@ export const PURCHASE_FINANCE_FLOWS = [
   "Purchase_Finance_With_AA_Loan_Foreclosure",
   "Purchase_Finance_With_AA_Missed_EMI_Payment",
   "Purchase_Finance_With_AA_Pre_Part_Payment",
-  "Purchase_Finance_With_AA_Cancellation"
+  "Purchase_Finance_With_AA_Cancellation",
+  // pramaan-validation-parity skill: previously unwired IGM(v-1.0.0) flows — now wired in
+  // ReportingConfig.yaml too, so the field-level validators below actually run for them.
+  "Purchase_Finance_With_AA_With_IGM(v-1.0.0)",
+  "Purchase_Finance_Without_AA_With_IGM(v-1.0.0)",
+  "Purchase_Finance_Single_Redirection_With_AA_With_IGM(v-1.0.0)",
+  "Purchase_Finance_Single_Redirection_Without_AA_With_IGM(v-1.0.0)"
 ]
 
 export const UNIFIED_CREDIT_FLOWS = [

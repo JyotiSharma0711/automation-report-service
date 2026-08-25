@@ -58,7 +58,25 @@ export default async function confirm(
           confirm_vs_on_init: { missingFromOnInit, priceMismatches },
         };
       }
-      
+
+      // pramaan-validation-parity skill: payment.id continuity, ported from Pramaan
+      // creditBuyerNPTest/v2.2.0/confirm.js (`expect(payment.id).to.be.equal(previous_on_init_payment_id)`).
+      // ON_INIT's payment.id must reappear unchanged in confirm — reuses the onInitData already
+      // fetched above rather than adding a second getActionData call. save-specs/FIS12/2.2.1/on_init.yaml
+      // already extracts `payments: "$.message.order.payments[*]"`, so this is available for free.
+      const onInitPayment = Array.isArray(onInitData?.payments) ? onInitData.payments[0] : onInitData?.payments;
+      const confirmPaymentsRaw = confirmMsg?.order?.payments;
+      const confirmPayment = Array.isArray(confirmPaymentsRaw) ? confirmPaymentsRaw[0] : confirmPaymentsRaw;
+      if (onInitPayment?.id && confirmPayment?.id) {
+        if (onInitPayment.id === confirmPayment.id) {
+          result.passed.push(`payment.id matches ON_INIT ('${confirmPayment.id}')`);
+        } else {
+          result.failed.push(`payment.id changed: ON_INIT returned '${onInitPayment.id}', confirm sent '${confirmPayment.id}'`);
+        }
+      }
+      // If either side is missing a payment.id, don't fail — some Purchase Finance flows may
+      // legitimately omit it at this step; only compare when both sides actually have one.
+
       // Validate form ID consistency if xinput is present
       await validateFormIdIfXinputPresent(confirmMsg, sessionID, flowId, txnId, "confirm", result);
     }
