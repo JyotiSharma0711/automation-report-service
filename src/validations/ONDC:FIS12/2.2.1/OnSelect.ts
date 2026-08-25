@@ -1,6 +1,8 @@
 import { TestResult, Payload } from "../../../types/payload";
 import { DomainValidators } from "../../shared/domainValidator";
-import { validateFIS12LoanQuote } from "../../shared/quoteValidations";
+// pramaan-validation-parity skill: validateFIS12LoanQuote import removed 2026-08-25 — the call
+// site below it was disabled at the user's request (see the doc comment further down). Re-add
+// `import { validateFIS12LoanQuote } from "../../shared/quoteValidations";` if re-enabling it.
 import { getActionData } from "../../../services/actionDataService";
 import { validateFormIdIfXinputPresent } from "../../shared/formValidations";
 import { saveFromElement } from "../../../utils/specLoader";
@@ -18,17 +20,14 @@ export default async function on_select(
   try {
     const message = element?.jsonRequest?.message;
     // pramaan-validation-parity skill: the generic quote-arithmetic call that used to be here
-    // (validateOrderQuote — breakup sums to price.value, ≤2 decimal places) now runs
-    // universally for every domain via flowContinuityValidators.ts's checkFlowContinuity(),
-    // called from checkPayload.ts before any domain file (this one included) is even reached —
-    // see that file for the consolidated version, so it's not duplicated here. Kept/added: the
-    // FIS12-specific loan-quote formula check (PRINCIPAL/INTEREST/EMI/PMT — see
-    // quoteValidations.ts's validateFIS12LoanQuote doc comment), which existed in that file but
-    // had no call site anywhere until now. Purchase-Finance-gated since FIS12 2.2.1 also covers
-    // other usecases (e.g. Credit Card) whose quote.breakup won't have PRINCIPAL/INTEREST titles.
-    if (message?.order?.quote && flowId && PURCHASE_FINANCE_FLOWS.includes(flowId)) {
-      validateFIS12LoanQuote(message, result);
-    }
+    // (validateOrderQuote — breakup sums to price.value) now runs universally for every domain
+    // via flowContinuityValidators.ts's checkFlowContinuity(), called from checkPayload.ts
+    // before any domain file (this one included) is even reached — see that file. The
+    // FIS12-specific loan-quote formula check (validateFIS12LoanQuote — PRINCIPAL/INTEREST/EMI)
+    // that was wired in here was disabled again 2026-08-25 at the user's explicit request: quote
+    // validation kept to just the one common breakup-total check, not domain-specific ones, for
+    // now. `validateFIS12LoanQuote` itself is untouched in quoteValidations.ts — re-add the
+    // import and this block to re-enable it for Purchase Finance specifically.
 
     // Compare item ids and prices with prior SELECT request if available
     const txnId = element?.jsonRequest?.context?.transaction_id as string | undefined;

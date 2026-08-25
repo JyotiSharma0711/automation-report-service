@@ -157,7 +157,15 @@ function checkOrderTrailAgainstOnSearch(element: Payload, priorPayloadsInFlow: P
   const order = ctxMessage(element)?.order;
   if (!order) return { passed, failed }; // search/on_search/status calls have no order to trail-check
 
-  const onSearchPayload = priorPayloadsInFlow.find((p) => ctx(p)?.action === 'on_search');
+  // pramaan-validation-parity skill: use the LATEST on_search before this call, not the first.
+  // Fixed 2026-08-25 after a real false failure: a multi-round search flow (e.g. a second
+  // search/on_search that reveals child items only after a parent item is picked) means an
+  // earlier on_search's catalog can be missing items a later one actually offered — `.find()`
+  // was grabbing the first on_search in the flow, so a genuinely-offered child item id (present
+  // in the last on_search) was reported as "not offered in ON_SEARCH". priorPayloadsInFlow is
+  // chronological, so the last match in a filter is the most recent on_search.
+  const onSearchPayloadsSoFar = priorPayloadsInFlow.filter((p) => ctx(p)?.action === 'on_search');
+  const onSearchPayload = onSearchPayloadsSoFar[onSearchPayloadsSoFar.length - 1];
   if (!onSearchPayload) return { passed, failed }; // no on_search seen yet in this flow
 
   const offerings = extractOnSearchOfferings(onSearchPayload);
@@ -205,6 +213,11 @@ function checkOrderTrailAgainstOnSearch(element: Payload, priorPayloadsInFlow: P
  * BPP response first mints it (typically on_select). Assumption flagged rather than silently
  * assumed: if some domain legitimately re-quotes (a new quote.id) between steps, gate this the
  * same way flowId-based checks are gated elsewhere in this codebase, rather than deleting it.
+ *
+ * pramaan-validation-parity skill: disabled 2026-08-25 at the user's explicit request — "quote
+ * ke liye bas 'Quote price matches breakup total' rakhte hai, baaki sabhi comment out karo."
+ * Kept defined (not deleted) and simply not called from checkFlowContinuity's `checks` array
+ * below — re-enable by adding `checkQuoteIdConsistency` back to that array.
  */
 function checkQuoteIdConsistency(element: Payload, priorPayloadsInFlow: Payload[]): { passed: string[]; failed: string[] } {
   const passed: string[] = [];
@@ -226,18 +239,21 @@ function checkQuoteIdConsistency(element: Payload, priorPayloadsInFlow: Payload[
 }
 
 /**
- * Quote arithmetic (breakup sums to price.value, ≤2 decimal places) — reuses the existing
- * validateQuote() from quoteValidations.ts rather than re-implementing it, and now runs
- * universally whenever ANY payload in ANY domain carries a message.order.quote. Previously this
- * only ran where a domain's own per-action file remembered to import and call it directly
- * (confirmed for FIS12's on_select/on_init/on_confirm — see those files' history for where the
- * now-redundant direct calls were removed in favor of this single shared call site).
+ * Quote arithmetic — reuses the existing validateQuote() from quoteValidations.ts rather than
+ * re-implementing it, and runs universally whenever ANY payload in ANY domain carries a
+ * message.order.quote (this is what makes it "common for all domains, not just FIS12").
+ *
+ * pramaan-validation-parity skill: 2026-08-25, at the user's explicit request, scoped down to
+ * ONLY `validateTotalMatch` ("Quote price matches breakup total" — breakup sums to price.value).
+ * `validateDecimalPlaces` (≤2 decimal places, on the quote total and every breakup line) is
+ * turned off, not deleted — flip it back to `true` here to re-enable it; nothing else needs to
+ * change, `validateQuote()` itself is untouched.
  */
 function checkQuoteArithmetic(element: Payload): { passed: string[]; failed: string[] } {
   const quote = ctxMessage(element)?.order?.quote;
   if (!quote) return { passed: [], failed: [] };
   const local: TestResult = { response: {}, passed: [], failed: [] };
-  validateQuote(quote, local, { validateDecimalPlaces: true, validateTotalMatch: true });
+  validateQuote(quote, local, { validateDecimalPlaces: false, validateTotalMatch: true });
   return { passed: local.passed, failed: local.failed };
 }
 
@@ -252,7 +268,9 @@ export function checkFlowContinuity(element: Payload, priorPayloadsInFlow: Paylo
     checkBapIdentityStability,
     checkBppIdentityStability,
     checkOrderTrailAgainstOnSearch,
-    checkQuoteIdConsistency,
+    // pramaan-validation-parity skill: checkQuoteIdConsistency disabled 2026-08-25 at the
+    // user's explicit request (see its doc comment above) — quote checks trimmed down to just
+    // the breakup-total-match, common across all domains. Add it back here to re-enable.
     (el: Payload, _prior: Payload[]) => checkQuoteArithmetic(el),
   ];
   const passed: string[] = [];
