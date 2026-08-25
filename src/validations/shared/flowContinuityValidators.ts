@@ -3,7 +3,7 @@ import { Payload, TestResult } from "../../types/payload";
 // pramaan-validation-parity skill: cross-call continuity checks, ported from Pramaan's
 // bussinessTests/commonBussiness.js (contextBussinessTests). This is the layer report-service
 // never had — checkPayload() only ever saw one payload at a time, so nothing could compare
-// "this call" against "the flow so far". These four checks are protocol-level (true for every
+// "this call" against "the flow so far". These checks are protocol-level (true for every
 // ONDC beckn domain by definition of the beckn context object), so they're written once here
 // and wired into checkPayload.ts for every domain, not duplicated per domain.
 //
@@ -14,25 +14,11 @@ function ctx(p: Payload | undefined | null): any {
   return p?.jsonRequest?.context;
 }
 
-/**
- * message_id must be unique across the whole flow.
- * Ported from commonBussiness.js's messageIdsMap check (RET_10 is exempted there for a
- * known duplicate-message_id quirk in that flow — no equivalent quirk is known for Purchase
- * Finance, so no exemption is carried over here; add one explicitly if a real flow needs it).
- */
-function checkMessageIdUniqueness(element: Payload, priorPayloadsInFlow: Payload[]): { passed: string[]; failed: string[] } {
-  const passed: string[] = [];
-  const failed: string[] = [];
-  const currentId = ctx(element)?.message_id;
-  if (!currentId) return { passed, failed }; // presence is contextValidators' job, not this one's
-  const duplicate = priorPayloadsInFlow.some((p) => ctx(p)?.message_id === currentId);
-  if (duplicate) {
-    failed.push(`context.message_id '${currentId}' was already used earlier in this flow (must be unique per call)`);
-  } else {
-    passed.push(`context.message_id '${currentId}' is unique in this flow so far`);
-  }
-  return { passed, failed };
-}
+// pramaan-validation-parity skill: a message_id-uniqueness-across-the-flow check (ported from
+// commonBussiness.js's messageIdsMap) was here and was removed at the user's explicit request —
+// not needed for this domain. If it's ever wanted back, the pattern is the same shape as
+// checkBapIdentityStability below: compare `ctx(element)?.message_id` against every prior
+// payload's, using `priorPayloadsInFlow`.
 
 /**
  * timestamp must strictly increase from one request to the next.
@@ -114,7 +100,6 @@ function checkBppIdentityStability(element: Payload, priorPayloadsInFlow: Payloa
  */
 export function checkFlowContinuity(element: Payload, priorPayloadsInFlow: Payload[]): TestResult {
   const checks = [
-    checkMessageIdUniqueness,
     checkTimestampMonotonicity,
     checkBapIdentityStability,
     checkBppIdentityStability,
