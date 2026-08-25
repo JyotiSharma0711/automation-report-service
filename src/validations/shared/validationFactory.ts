@@ -608,18 +608,21 @@ function validateTags(
 
     // Validate BUYER_FINDER_FEES_TYPE
     const buyerFinderFeesType = getValue("BUYER_FINDER_FEES_TYPE");
-    const validTypes = ["amount", "percent", "percent-annualized"];
+    // pramaan-validation-parity skill — L1 AUDIT: the enum-membership check that used to be here
+    // (must be one of amount/percent/percent-annualized) is a duplicate of
+    // automation-specifications/config/validations/index.yaml's search.SEARCH_PAYMENT ->
+    // VALID_BUYER_FINDER_FEES_TYPE_VALUE — same 3 values, same BAP_TERMS/BUYER_FINDER_FEES_TYPE
+    // scope, and it runs unconditionally (no _CONTINUE_ gate) so it's not something L1 only
+    // checks "if present" — it always re-validates the value this code was also re-validating.
+    // Presence is kept: L1 has no dedicated REQUIRED_ rule for this specific subtag (only
+    // REQUIRED_BAP_TERMS_LIST, a whitelist over whichever subtags happen to be present), so
+    // presence-checking here is still real coverage, not duplication. The type-dependent branch
+    // below still needs the raw value either way.
     if (!buyerFinderFeesType) {
       testResults.failed.push("BUYER_FINDER_FEES_TYPE is missing in BAP_TERMS");
-    } else if (!validTypes.includes(buyerFinderFeesType)) {
-      testResults.failed.push(
-        `BUYER_FINDER_FEES_TYPE should be one of: ${validTypes.join(
-          ", "
-        )}, found: ${buyerFinderFeesType}`
-      );
     } else {
       testResults.passed.push(
-        `BUYER_FINDER_FEES_TYPE is valid: ${buyerFinderFeesType}`
+        `BUYER_FINDER_FEES_TYPE is present: ${buyerFinderFeesType}`
       );
 
       // Validate required fields based on type
@@ -1448,16 +1451,14 @@ function validatePurchaseFinanceInit(
       }
     });
 
-    // Validate SETTLEMENT_TYPE
-    const settlementType = getValue("SETTLEMENT_TYPE");
-    if (
-      settlementType &&
-      !["neft", "rtgs", "upi", "imps"].includes(settlementType.toLowerCase())
-    ) {
-      testResults.failed.push(
-        `Payment ${paymentIndex}: Invalid SETTLEMENT_TYPE "${settlementType}". Should be one of: neft, rtgs, upi, imps`
-      );
-    }
+    // pramaan-validation-parity skill — L1 AUDIT: the SETTLEMENT_TYPE enum check that used to be
+    // here (must be one of neft/rtgs/upi/imps) is a direct duplicate of
+    // automation-specifications/config/validations/index.yaml's init.INIT_PAYMENT_TAGS ->
+    // VALID_SETTLEMENT_TYPE_VALUE — same 4 values, same BAP_TERMS/SETTLEMENT_TYPE scope,
+    // unconditional on the L1 side. Presence of SETTLEMENT_TYPE itself is unaffected — it's
+    // still enforced by the requiredFields loop above, which this block never duplicated (it
+    // only ran `if (settlementType && ...)`, i.e. it was pure re-validation of an already-typed
+    // value). Removed rather than left as dead re-checking of an L1-owned rule.
 
     // Validate SETTLEMENT_AMOUNT calculation for BAP_TERMS
     validateSettlementAmount(

@@ -1,4 +1,5 @@
 import { Payload, TestResult } from "../../types/payload";
+import { validateQuote } from "./quoteValidations";
 
 // pramaan-validation-parity skill: cross-call continuity checks, ported from Pramaan's
 // bussinessTests/commonBussiness.js (contextBussinessTests). This is the layer report-service
@@ -9,9 +10,19 @@ import { Payload, TestResult } from "../../types/payload";
 //
 // `priorPayloadsInFlow` is everything already processed for this flow, in chronological order,
 // BEFORE the current element. It does not include the current element itself.
+//
+// 2026-08-25 addition: order-trail-vs-ON_SEARCH, quote.id cross-call consistency, and quote
+// arithmetic. Requested explicitly — "trail maintain honi chahiye sabhi calls ke liye from
+// on_search to all calls", "quote id sabhi me match hona chahiye calculation sahi honi chahiye",
+// "ho sake inko common bnao sabhi domains ke liye". Same rationale as above: written once,
+// runs for every domain that has an ON_SEARCH catalog / a quote, no per-domain wiring needed.
 
 function ctx(p: Payload | undefined | null): any {
   return p?.jsonRequest?.context;
+}
+
+function ctxMessage(p: Payload | undefined | null): any {
+  return p?.jsonRequest?.message;
 }
 
 // pramaan-validation-parity skill: a message_id-uniqueness-across-the-flow check (ported from
@@ -94,6 +105,143 @@ function checkBppIdentityStability(element: Payload, priorPayloadsInFlow: Payloa
 }
 
 /**
+ * Everything a `message.order` references (provider.id, items[].id, fulfillments[].id) must
+ * trace back to what ON_SEARCH actually offered for this flow. This generalizes the check that
+ * previously existed only for FIS12's `select` action (`compareSelectVsOnSearch` in
+ * actionDataService.ts, called from validations/ONDC:FIS12/2.2.1/select.ts) — which also had a
+ * bug: it treated `onSearch.providers` as a single object when building the item/fulfillment
+ * universe (`onSearch?.providers?.items`), even though it correctly handled `providers` as an
+ * array for the provider-id check two lines above. On a real multi-provider catalog (`providers`
+ * is always an array per the beckn schema), that made `onSearchItemIds`/`onSearchFulfillmentIds`
+ * come back empty, so every real select would report ALL its items/fulfillments as "missing in
+ * ON_SEARCH" — a false failure, not a missed check. Fixed here by building a proper
+ * per-provider Map. `select.ts`'s call to the old buggy helper was removed in favor of this.
+ *
+ * Runs for every action that carries a `message.order` (select, init, confirm, update, and
+ * their on_* echoes) and every domain — ON_SEARCH itself and `search` (which has
+ * `message.intent`, not `message.order`) are naturally exempt since neither has an order to
+ * check yet.
+ */
+function extractOnSearchOfferings(onSearchPayload: Payload | undefined): {
+  providerIds: Set<string>;
+  itemIdsByProvider: Map<string, Set<string>>;
+  fulfillmentIdsByProvider: Map<string, Set<string>>;
+  allItemIds: Set<string>;
+  allFulfillmentIds: Set<string>;
+} {
+  const result = {
+    providerIds: new Set<string>(),
+    itemIdsByProvider: new Map<string, Set<string>>(),
+    fulfillmentIdsByProvider: new Map<string, Set<string>>(),
+    allItemIds: new Set<string>(),
+    allFulfillmentIds: new Set<string>(),
+  };
+  const providers = ctxMessage(onSearchPayload)?.catalog?.providers;
+  if (!Array.isArray(providers)) return result;
+  for (const p of providers) {
+    if (!p?.id) continue;
+    result.providerIds.add(p.id);
+    const itemIds = new Set<string>((p.items || []).map((it: any) => it?.id).filter(Boolean));
+    const fulfillmentIds = new Set<string>((p.fulfillments || []).map((f: any) => f?.id).filter(Boolean));
+    result.itemIdsByProvider.set(p.id, itemIds);
+    result.fulfillmentIdsByProvider.set(p.id, fulfillmentIds);
+    itemIds.forEach((id) => result.allItemIds.add(id));
+    fulfillmentIds.forEach((id) => result.allFulfillmentIds.add(id));
+  }
+  return result;
+}
+
+function checkOrderTrailAgainstOnSearch(element: Payload, priorPayloadsInFlow: Payload[]): { passed: string[]; failed: string[] } {
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const order = ctxMessage(element)?.order;
+  if (!order) return { passed, failed }; // search/on_search/status calls have no order to trail-check
+
+  const onSearchPayload = priorPayloadsInFlow.find((p) => ctx(p)?.action === 'on_search');
+  if (!onSearchPayload) return { passed, failed }; // no on_search seen yet in this flow
+
+  const offerings = extractOnSearchOfferings(onSearchPayload);
+  if (offerings.providerIds.size === 0) return { passed, failed }; // on_search had nothing to compare against
+
+  const providerId = order?.provider?.id;
+  if (providerId) {
+    if (offerings.providerIds.has(providerId)) {
+      passed.push(`order.provider.id '${providerId}' was offered in ON_SEARCH`);
+    } else {
+      failed.push(`order.provider.id '${providerId}' was not offered in ON_SEARCH (offered: ${[...offerings.providerIds].join(', ')})`);
+    }
+  }
+
+  // Scope items/fulfillments to the specific provider when we know it; otherwise fall back to
+  // the union across every provider ON_SEARCH offered (still catches an id that isn't in the
+  // catalog anywhere, even before we're sure which provider this call is about).
+  const itemUniverse = (providerId && offerings.itemIdsByProvider.get(providerId)) || offerings.allItemIds;
+  const itemIds: string[] = (order.items || []).map((it: any) => it?.id).filter(Boolean);
+  if (itemIds.length) {
+    const missing = itemIds.filter((id: string) => !itemUniverse.has(id));
+    if (missing.length === 0) {
+      passed.push(`All order.items (${itemIds.length}) trace back to ON_SEARCH`);
+    } else {
+      failed.push(`order.items not offered in ON_SEARCH: ${missing.join(', ')}`);
+    }
+  }
+
+  const fulfillmentUniverse = (providerId && offerings.fulfillmentIdsByProvider.get(providerId)) || offerings.allFulfillmentIds;
+  const fulfillmentIds: string[] = (order.fulfillments || []).map((f: any) => f?.id).filter(Boolean);
+  if (fulfillmentIds.length) {
+    const missing = fulfillmentIds.filter((id: string) => !fulfillmentUniverse.has(id));
+    if (missing.length === 0) {
+      passed.push(`All order.fulfillments (${fulfillmentIds.length}) trace back to ON_SEARCH`);
+    } else {
+      failed.push(`order.fulfillments not offered in ON_SEARCH: ${missing.join(', ')}`);
+    }
+  }
+
+  return { passed, failed };
+}
+
+/**
+ * quote.id must stay the same across every call in the flow that carries one, once whichever
+ * BPP response first mints it (typically on_select). Assumption flagged rather than silently
+ * assumed: if some domain legitimately re-quotes (a new quote.id) between steps, gate this the
+ * same way flowId-based checks are gated elsewhere in this codebase, rather than deleting it.
+ */
+function checkQuoteIdConsistency(element: Payload, priorPayloadsInFlow: Payload[]): { passed: string[]; failed: string[] } {
+  const passed: string[] = [];
+  const failed: string[] = [];
+  const currentQuoteId = ctxMessage(element)?.order?.quote?.id;
+  if (!currentQuoteId) return { passed, failed };
+
+  const priorWithQuote = priorPayloadsInFlow.find((p) => ctxMessage(p)?.order?.quote?.id);
+  if (!priorWithQuote) return { passed, failed }; // first call in this flow that carries a quote
+
+  const priorQuoteId = ctxMessage(priorWithQuote)?.order?.quote?.id;
+  const priorAction = ctx(priorWithQuote)?.action;
+  if (currentQuoteId === priorQuoteId) {
+    passed.push(`quote.id is stable since ${priorAction} ('${currentQuoteId}')`);
+  } else {
+    failed.push(`quote.id changed since ${priorAction}: was '${priorQuoteId}', now '${currentQuoteId}'`);
+  }
+  return { passed, failed };
+}
+
+/**
+ * Quote arithmetic (breakup sums to price.value, ≤2 decimal places) — reuses the existing
+ * validateQuote() from quoteValidations.ts rather than re-implementing it, and now runs
+ * universally whenever ANY payload in ANY domain carries a message.order.quote. Previously this
+ * only ran where a domain's own per-action file remembered to import and call it directly
+ * (confirmed for FIS12's on_select/on_init/on_confirm — see those files' history for where the
+ * now-redundant direct calls were removed in favor of this single shared call site).
+ */
+function checkQuoteArithmetic(element: Payload): { passed: string[]; failed: string[] } {
+  const quote = ctxMessage(element)?.order?.quote;
+  if (!quote) return { passed: [], failed: [] };
+  const local: TestResult = { response: {}, passed: [], failed: [] };
+  validateQuote(quote, local, { validateDecimalPlaces: true, validateTotalMatch: true });
+  return { passed: local.passed, failed: local.failed };
+}
+
+/**
  * Runs all universal cross-call continuity checks for one payload against everything already
  * processed for its flow. Called from checkPayload.ts right after the existing
  * runValidations(contextValidators(), ...) call — every domain gets this for free.
@@ -103,6 +251,9 @@ export function checkFlowContinuity(element: Payload, priorPayloadsInFlow: Paylo
     checkTimestampMonotonicity,
     checkBapIdentityStability,
     checkBppIdentityStability,
+    checkOrderTrailAgainstOnSearch,
+    checkQuoteIdConsistency,
+    (el: Payload, _prior: Payload[]) => checkQuoteArithmetic(el),
   ];
   const passed: string[] = [];
   const failed: string[] = [];
