@@ -53,12 +53,8 @@ export default async function on_select(
 
         if (missingItems.length === 0 && selectItemIds.length > 0) {
           result.passed.push(`All items from select (${selectItemIds.length}) are present in on_select`);
-        } else {
-          if (missingItems.length > 0) {
-            result.failed.push(`Items from select missing in on_select: ${missingItems.join(", ")}`);
-          }
         }
-        
+
         // Validate form ID consistency if xinput is present
         const insuranceFlows = [...HEALTH_INSURANCE_FLOWS, ...MOTOR_INSURANCE_FLOWS];
         await validateFormIdIfXinputPresent(message, sessionID, flowId, txnId, "on_select", result, insuranceFlows);

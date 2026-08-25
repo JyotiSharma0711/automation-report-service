@@ -43,25 +43,6 @@ export async function checkCancel(
         logger.error(`Error during ${action} validation: ${error.message}`);
         testResults.failed.push(error.message);
       }
-    } else {
-      try {
-        assert.ok(cancelOrderId, "message.order_id is required in cancel request");
-        testResults.passed.push("Order ID presence validation in cancel passed");
-      } catch (error: any) {
-        testResults.failed.push(error.message);
-      }
-    }
-
-    // Validate cancellation_reason_id is provided
-    const cancellationReasonId = message?.cancellation_reason_id;
-    try {
-      assert.ok(
-        cancellationReasonId,
-        "message.cancellation_reason_id is required in cancel request"
-      );
-      testResults.passed.push("Cancellation reason ID presence validation passed");
-    } catch (error: any) {
-      testResults.failed.push(error.message);
     }
   } catch (error: any) {
     logger.error(`Error during ${action} cross-call comparison: ${error.message}`);

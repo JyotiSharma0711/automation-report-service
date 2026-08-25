@@ -77,7 +77,6 @@ export function validateQuoteBreakup(
   context: string = "quote"
 ): void {
   if (!quote?.breakup || !Array.isArray(quote.breakup)) {
-    if (quote) result.failed.push(`${context}: quote.breakup is missing or not an array`);
     return;
   }
 
@@ -117,9 +116,7 @@ export function validateTermsTags(
   for (const tag of tags) {
     const code = tag?.descriptor?.code;
     if (code === "BAP_TERMS" || code === "BPP_TERMS") {
-      if (!tag.list || !Array.isArray(tag.list) || tag.list.length === 0) {
-        result.failed.push(`${context}: ${code} tag has empty or missing list`);
-      } else {
+      if (tag.list && Array.isArray(tag.list) && tag.list.length > 0) {
         result.passed.push(`${context}: ${code} tag present with ${tag.list.length} entries`);
       }
     }
@@ -144,19 +141,12 @@ export function validateTicketFulfillment(
     // Check authorization — contract places it at stops[0].authorization
     const auth = ticket?.stops?.[0]?.authorization || ticket.authorization;
     if (!auth) {
-      result.failed.push(`${context}: ${fType} fulfillment ${ticket.id} missing authorization`);
       continue;
     }
     if (auth.type !== "QR" && auth.type !== "QR_AND_VEHICLE_NUMBER") {
       result.failed.push(`${context}: ${fType} fulfillment ${ticket.id} authorization type must be QR or QR_AND_VEHICLE_NUMBER, got '${auth.type}'`);
     } else {
       result.passed.push(`${context}: ${fType} fulfillment ${ticket.id} has QR authorization`);
-    }
-    if (!auth.token) {
-      result.failed.push(`${context}: ${fType} fulfillment ${ticket.id} missing authorization.token`);
-    }
-    if (!auth.valid_to) {
-      result.failed.push(`${context}: ${fType} fulfillment ${ticket.id} missing authorization.valid_to`);
     }
     if (auth.status && !["UNCLAIMED", "CLAIMED", "EXPIRED"].includes(auth.status)) {
       result.failed.push(

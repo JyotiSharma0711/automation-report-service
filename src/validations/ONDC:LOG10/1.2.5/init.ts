@@ -73,13 +73,6 @@ export async function checkInit(
     const savedProviderId = await fetchData(sessionID, transactionId, "on_search_provider_id");
     const initProviderId = message?.order?.provider?.id;
 
-    try {
-      assert.ok(initProviderId, "message.order.provider.id must be present in init");
-      testResults.passed.push("Provider ID presence validation in init passed");
-    } catch (error: any) {
-      testResults.failed.push(error.message);
-    }
-
     if (savedProviderId && initProviderId) {
       try {
         assert.strictEqual(

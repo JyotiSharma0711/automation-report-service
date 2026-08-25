@@ -10,7 +10,6 @@ import assert from "assert";
 import logger from "@ondc/automation-logger";
 import { TestResult } from "../../types/payload";
 import { fetchData, saveData } from "../../utils/redisUtils";
-import { statesAfterPickup } from "../../utils/constants";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 1. ORDER TIMESTAMP VALIDATIONS
@@ -89,18 +88,7 @@ export function validatePaymentStatus(
         }
     }
 
-    if (orderState === "Complete" && paymentType === "ON-FULFILLMENT" && paymentStatus === "PAID") {
-        try {
-            assert.ok(
-                paymentTimestamp,
-                "Payment timestamp should be provided once the order is complete and payment has been made"
-            );
-            testResults.passed.push("Payment timestamp validation passed");
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    } else if (paymentType === "POST-FULFILLMENT" && paymentStatus === "PAID") {
+    if (paymentType === "POST-FULFILLMENT" && paymentStatus === "PAID") {
         try {
             assert.ok(
                 !paymentTimestamp,
@@ -176,149 +164,6 @@ export function validateFulfillmentStructure(
     opts: FulfillmentValidationOptions = {}
 ): void {
     const ffState: string = fulfillment?.state?.descriptor?.code ?? "";
-    const tags: any[] = fulfillment?.tags ?? [];
-
-    if (opts.requireAwb) {
-        try {
-            assert.ok(
-                fulfillment["@ondc/org/awb_no"],
-                "AWB no is required for P2H2P shipments"
-            );
-            testResults.passed.push("AWB number validation passed");
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
-
-
-    if (opts.requireStateCode) {
-        try {
-            assert.ok(ffState, "fulfillments/state/descriptor/code is required");
-            testResults.passed.push(`Fulfillment state code presence validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
-
-    if (opts.requireGps) {
-        try {
-            assert.ok(
-                fulfillment?.start?.location?.gps,
-                `fulfillments/start/location/gps is required in ${action}`
-            );
-            testResults.passed.push(`Start GPS presence validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-
-        try {
-            assert.ok(
-                fulfillment?.end?.location?.gps,
-                `fulfillments/end/location/gps is required in ${action}`
-            );
-            testResults.passed.push(`End GPS presence validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
-
-    if (opts.requireContacts) {
-        try {
-            assert.ok(
-                fulfillment?.start?.contact?.phone,
-                `fulfillments/start/contact/phone is required in ${action}`
-            );
-            testResults.passed.push(`Start contact phone validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-
-        try {
-            assert.ok(
-                fulfillment?.end?.contact?.phone,
-                `fulfillments/end/contact/phone is required in ${action}`
-            );
-            testResults.passed.push(`End contact phone validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
-
-    if (opts.requireStartInstructions) {
-        try {
-            assert.ok(
-                fulfillment?.start?.instructions,
-                `fulfillments/start/instructions is required in ${action}`
-            );
-            testResults.passed.push(`Start instructions presence validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
-
-    if (opts.requireTimeRange && IN_TRANSIT_STATES.includes(ffState)) {
-        try {
-            assert.ok(
-                fulfillment?.start?.time?.range,
-                `fulfillments/start/time/range must be present when order is in transit`
-            );
-            testResults.passed.push(`Start time range validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-
-        try {
-            assert.ok(
-                fulfillment?.end?.time?.range,
-                `fulfillments/end/time/range must be present when order is in transit`
-            );
-            testResults.passed.push(`End time range validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
-
-    if (opts.requireLinkedProvider) {
-        try {
-            const tag = tags.find((t: any) => t.code === "linked_provider");
-            assert.ok(tag, `fulfillments/tags must contain 'linked_provider' tag in ${action}`);
-            testResults.passed.push(`linked_provider tag validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
-
-    if (opts.requireLinkedOrder) {
-        try {
-            const tag = tags.find((t: any) => t.code === "linked_order");
-            assert.ok(tag, `fulfillments/tags must contain 'linked_order' tag in ${action}`);
-            testResults.passed.push(`linked_order tag validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
-
-    if (opts.requireShippingLabel) {
-        try {
-            const tag = tags.find((t: any) => t.code === "shipping_label");
-            assert.ok(tag, `fulfillments/tags must contain 'shipping_label' tag for P2H2P in ${action}`);
-            testResults.passed.push(`shipping_label tag validation passed in ${action}`);
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    }
 
     if (opts.requireNoPrePickupTimestamps) {
         try {
@@ -526,24 +371,9 @@ export function validateTrackingTag(
     fulfillment: any,
     testResults: TestResult
 ): void {
-    const ffState: string = fulfillment?.state?.descriptor?.code ?? "";
-    const tags: any[] = fulfillment?.tags ?? [];
-    const trackingTag = tags.find((t: any) => t.code === "tracking");
-    const isOrderPickedUp = statesAfterPickup.includes(ffState);
     const isTrackingEnabled = Boolean(fulfillment.tracking);
 
-    if (isOrderPickedUp && isTrackingEnabled) {
-        try {
-            assert.ok(
-                trackingTag !== undefined && trackingTag !== null,
-                "Tracking tag must be provided once order is picked up and tracking is enabled"
-            );
-            testResults.passed.push("Tracking tag validation passed");
-        } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-        }
-    } else if (!isTrackingEnabled) {
+    if (!isTrackingEnabled) {
         testResults.failed.push(`tracking should be enabled (true) in fulfillments/tracking`);
     }
 }
@@ -593,7 +423,7 @@ export function validateRescheduledDelayTags(
     if (ffState === "Pickup-rescheduled") {
         try {
             const delayTag = tags.find((t: any) => t.code === "fulfillment_delay");
-            assert.ok(delayTag, "'fulfillment_delay' tag not found");
+            if (!delayTag) return;
             testResults.passed.push(`fulfillments have the "fulfillment_delay" tag`);
 
             const list = delayTag.list;

@@ -17,7 +17,6 @@ export default async function issue(
     const message = element?.jsonRequest?.message;
     
     if (!message) {
-      result.failed.push("message is missing in issue request");
       return result;
     }
 

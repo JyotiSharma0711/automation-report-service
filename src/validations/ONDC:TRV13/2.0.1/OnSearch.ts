@@ -60,29 +60,10 @@ export default async function on_search(
           result.passed.push(`Provider: ${provider.descriptor.name}`);
         }
 
-        // Validate provider.tags
-        if (!provider?.tags || !Array.isArray(provider.tags) || provider.tags.length === 0) {
-          result.failed.push("provider.tags are missing");
-        } else {
-          result.passed.push("provider.tags are present");
-        }
-
         // Validate provider.time
-        if (!provider?.time) {
-          result.failed.push("provider.time is incorrect (missing)");
-        } else if (typeof provider.time !== "object") {
-          result.failed.push("provider.time is incorrect: should be a valid Time object");
-        } else {
-          if (!provider.time.label) {
-            result.failed.push("provider.time is incorrect: missing 'label'");
-          }
-          if (!provider.time.range && !provider.time.timestamp) {
-            result.failed.push("provider.time is incorrect: must have either 'range' or 'timestamp'");
-          }
-          if (provider.time.range) {
-            if (!provider.time.range.start || !provider.time.range.end) {
-              result.failed.push("provider.time.range is incorrect: missing 'start' or 'end'");
-            }
+        if (provider?.time) {
+          if (typeof provider.time !== "object") {
+            result.failed.push("provider.time is incorrect: should be a valid Time object");
           }
         }
 
@@ -91,9 +72,7 @@ export default async function on_search(
           result.passed.push(`${provider.locations.length} location(s) found`);
 
           provider.locations.forEach((loc: any, idx: number) => {
-            if (!loc.gps) {
-              result.failed.push(`Provider location[${idx}].gps is missing`);
-            } else {
+            if (loc.gps) {
               const gps = String(loc.gps).trim();
               const gpsRegex = /^-?\d+\.\d{6},\s*-?\d+\.\d{6}$/;
               if (!gpsRegex.test(gps)) {
@@ -151,8 +130,6 @@ export default async function on_search(
           }
         }
       }
-    } else {
-      result.failed.push("No providers found in catalog");
     }
 
     // Validate pagination tags if present

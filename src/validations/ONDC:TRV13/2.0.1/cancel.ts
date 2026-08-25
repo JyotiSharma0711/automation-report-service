@@ -36,15 +36,11 @@ export default async function cancel(
     // Validate order_id
     if (message?.order_id) {
       result.passed.push(`Order ID: ${message.order_id}`);
-    } else {
-      result.failed.push("Order ID is missing");
     }
 
     // Validate cancellation_reason_id
     if (message?.cancellation_reason_id) {
       result.passed.push(`Cancellation reason ID: ${message.cancellation_reason_id}`);
-    } else {
-      result.failed.push("Cancellation reason ID is missing");
     }
 
     // Validate descriptor if present

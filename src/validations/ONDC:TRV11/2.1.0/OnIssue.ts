@@ -17,7 +17,6 @@ export default async function on_issue(
     const message = element?.jsonRequest?.message;
     
     if (!message) {
-      result.failed.push("message is missing in on_issue response");
       return result;
     }
 

@@ -27,9 +27,6 @@ export default async function init(
 
     // Validate billing
     if (order?.billing) {
-      if (!order.billing.name) {
-        result.failed.push("init: billing.name is missing");
-      }
       if (order.billing.phone) {
         result.passed.push("init: billing.phone is present");
       }

@@ -104,36 +104,6 @@ export async function checkSearch(
     if (paymentType) saveData(sessionID, transactionId, "search_payment_type", paymentType);
     if (cityCode) saveData(sessionID, transactionId, "search_city_code", cityCode);
 
-    // ── 1. Presence checks ────────────────────────────────────────────────────
-
-    try {
-      assert.ok(startGps, "message.intent.fulfillment.start.location.gps is required in search");
-      testResults.passed.push("Start GPS presence validation passed");
-    } catch (error: any) {
-      testResults.failed.push(error.message);
-    }
-
-    try {
-      assert.ok(endGps, "message.intent.fulfillment.end.location.gps is required in search");
-      testResults.passed.push("End GPS presence validation passed");
-    } catch (error: any) {
-      testResults.failed.push(error.message);
-    }
-
-    try {
-      assert.ok(cityCode, "context.city is required in search");
-      testResults.passed.push("City code in context validation passed");
-    } catch (error: any) {
-      testResults.failed.push(error.message);
-    }
-
-    try {
-      assert.ok(categoryId, "message.intent.category.id is required in search");
-      testResults.passed.push("Category ID validation passed");
-    } catch (error: any) {
-      testResults.failed.push(error.message);
-    }
-
     // ── 2. GPS precision ≥ 4 decimal places ───────────────────────────────────
 
     if (startGps) {

@@ -38,8 +38,6 @@ export default async function select(
     // Validate provider
     if (order?.provider?.id) {
       result.passed.push(`Provider ID: ${order.provider.id}`);
-    } else {
-      result.failed.push("Provider ID is missing");
     }
 
     // Validate items

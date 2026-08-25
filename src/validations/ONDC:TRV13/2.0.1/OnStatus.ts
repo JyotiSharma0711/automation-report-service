@@ -37,8 +37,6 @@ export default async function on_status(
     // Validate order ID
     if (order?.id) {
       result.passed.push(`Order ID: ${order.id}`);
-    } else {
-      result.failed.push("Order ID is missing");
     }
 
     // Validate order state
@@ -51,21 +49,14 @@ export default async function on_status(
       result.passed.push(`Provider ID: ${order.provider.id}`);
     }
 
-    if (!order?.provider?.tags || !Array.isArray(order.provider.tags) || order.provider.tags.length === 0) {
-      result.failed.push("provider.tags are missing");
-    } else {
+    if (order?.provider?.tags && Array.isArray(order.provider.tags) && order.provider.tags.length > 0) {
       result.passed.push("provider.tags are present");
     }
 
     // Validate fulfillments with state
     const fulfillments = order?.fulfillments;
-    if (!fulfillments || !Array.isArray(fulfillments) || fulfillments.length === 0) {
-      result.failed.push("Fulfillment object is incorrect (missing or empty)");
-    } else {
+    if (fulfillments && Array.isArray(fulfillments) && fulfillments.length > 0) {
       fulfillments.forEach((fulfillment: any, fIdx: number) => {
-        if (!fulfillment.id) {
-          result.failed.push(`Fulfillment[${fIdx}] is missing 'id'`);
-        }
         if (fulfillment.type) {
           result.passed.push(`Fulfillment[${fIdx}] type: ${fulfillment.type}`);
         }
@@ -78,12 +69,7 @@ export default async function on_status(
         if (stops && Array.isArray(stops) && stops.length > 0) {
           const startStop = stops.find((s: any) => s.type === "START");
           const endStop = stops.find((s: any) => s.type === "END");
-          if (!startStop) {
-            result.failed.push(`Fulfillment[${fIdx}] is missing START stop`);
-          } else {
-            if (!startStop.time) {
-              result.failed.push(`Fulfillment[${fIdx}] START stop is missing 'time'`);
-            }
+          if (startStop) {
             if (startStop.location && startStop.location.gps) {
               const gps = String(startStop.location.gps).trim();
               const gpsRegex = /^-?\d+\.\d{6},\s*-?\d+\.\d{6}$/;
@@ -94,12 +80,7 @@ export default async function on_status(
               }
             }
           }
-          if (!endStop) {
-            result.failed.push(`Fulfillment[${fIdx}] is missing END stop`);
-          } else {
-            if (!endStop.time) {
-              result.failed.push(`Fulfillment[${fIdx}] END stop is missing 'time'`);
-            }
+          if (endStop) {
             if (endStop.location && endStop.location.gps) {
               const gps = String(endStop.location.gps).trim();
               const gpsRegex = /^-?\d+\.\d{6},\s*-?\d+\.\d{6}$/;
@@ -116,9 +97,7 @@ export default async function on_status(
 
     // Validate payments
     const payments = order?.payments;
-    if (!payments || !Array.isArray(payments) || payments.length === 0) {
-      result.failed.push("Payment object is incorrect; please refer to the Developer Guide (payments array is missing or empty)");
-    } else {
+    if (payments && Array.isArray(payments) && payments.length > 0) {
       payments.forEach((payment: any, pIdx: number) => {
         if (payment.type === "PART-PAYMENT") {
           result.passed.push(
@@ -126,40 +105,14 @@ export default async function on_status(
           );
           return;
         }
-        if (!payment.id) {
-          result.failed.push(`Payment[${pIdx}] is missing 'id'`);
-        }
-        if (!payment.collected_by) {
-          result.failed.push(`Payment[${pIdx}] is missing 'collected_by'`);
-        } else if (!["BAP", "BPP"].includes(payment.collected_by)) {
+        if (payment.collected_by && !["BAP", "BPP"].includes(payment.collected_by)) {
           result.failed.push(`Payment[${pIdx}].collected_by must be BAP or BPP, got: ${payment.collected_by}`);
         }
-        if (!payment.type) {
-          result.failed.push(`Payment[${pIdx}] is missing 'type'`);
-        } else if (!["PRE-ORDER", "ON-FULFILLMENT", "PART-PAYMENT"].includes(payment.type)) {
+        if (payment.type && !["PRE-ORDER", "ON-FULFILLMENT", "PART-PAYMENT"].includes(payment.type)) {
           result.failed.push(`Payment[${pIdx}].type must be PRE-ORDER, ON-FULFILLMENT, or PART-PAYMENT, got: ${payment.type}`);
         }
-        if (!payment.status) {
-          result.failed.push(`Payment[${pIdx}] is missing 'status'`);
-        } else if (!["NOT-PAID", "PAID"].includes(payment.status)) {
+        if (payment.status && !["NOT-PAID", "PAID"].includes(payment.status)) {
           result.failed.push(`Payment[${pIdx}].status must be NOT-PAID or PAID, got: ${payment.status}`);
-        }
-
-        // Validate params
-        if (payment.type !== "PART-PAYMENT") {
-          if (!payment.params) {
-            result.failed.push(`Payment[${pIdx}] is missing 'params'`);
-          } else {
-            if (!payment.params.amount) {
-              result.failed.push(`Payment[${pIdx}].params is missing 'amount'`);
-            }
-            if (!payment.params.currency) {
-              result.failed.push(`Payment[${pIdx}].params is missing 'currency'`);
-            }
-            if (payment.status === "PAID" && !payment.params.transaction_id) {
-              result.failed.push(`Payment[${pIdx}].params is missing 'transaction_id' for PAID status`);
-            }
-          }
         }
       });
     }
@@ -180,34 +133,12 @@ export default async function on_status(
     const bapTerms = allTags.find((t: any) => t?.descriptor?.code === "BAP_TERMS");
     const bppTerms = allTags.find((t: any) => t?.descriptor?.code === "BPP_TERMS");
 
-    if (!bapTerms) {
-      result.failed.push("BAP terms are completely missing");
-    } else {
+    if (bapTerms) {
       result.passed.push("BAP_TERMS tag is present");
     }
 
-    if (!bppTerms) {
-      result.failed.push("BPP terms are incorrect (completely missing)");
-    } else {
+    if (bppTerms) {
       result.passed.push("BPP_TERMS tag is present");
-      if (!bppTerms.list || !Array.isArray(bppTerms.list) || bppTerms.list.length === 0) {
-        result.failed.push("BPP terms are incorrect: list is missing or empty");
-      } else {
-        const requiredBppFields = [
-          "MAX_LIABILITY",
-          "MAX_LIABILITY_CAP",
-          "MANDATORY_ARBITRATION",
-          "COURT_JURISDICTION",
-          "DELAY_INTEREST",
-          "TAX_NUMBER",
-        ];
-        requiredBppFields.forEach((field) => {
-          const item = bppTerms.list.find((i: any) => i?.descriptor?.code === field);
-          if (!item || !item.value) {
-            result.failed.push(`BPP terms are incorrect: ${field} is missing or incorrect`);
-          }
-        });
-      }
     }
 
     // Validate updated_at

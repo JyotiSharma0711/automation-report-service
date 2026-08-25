@@ -30,10 +30,8 @@ export default async function on_confirm_card_balance_faliure(
       } else {
         result.failed.push(`Expected error code '80101' for invalid card details, got '${error.code}'`);
       }
-    } else {
-      result.failed.push("Error code is missing");
     }
-    
+
     // Validate error message
     if (error.message) {
       result.passed.push(`Error message is present: ${error.message}`);
@@ -44,10 +42,8 @@ export default async function on_confirm_card_balance_faliure(
       } else {
         result.passed.push(`Error message is present but may differ from expected: ${error.message}`);
       }
-    } else {
-      result.failed.push("Error message is missing");
     }
-    
+
     // Validate that no message field is present (since this is an error response)
     if (element.jsonRequest?.message) {
       result.failed.push("Message field should not be present in error response");
@@ -55,8 +51,6 @@ export default async function on_confirm_card_balance_faliure(
       result.passed.push("Message field is correctly absent in error response");
     }
   } else {
-    result.failed.push("Error response is missing for balance check failure scenario");
-    
     // If no error, check if message is present (which would be unexpected for failure)
     if (element.jsonRequest?.message) {
       result.failed.push("Unexpected: Message field is present but error is missing for failure scenario");

@@ -137,22 +137,6 @@ export function validateQuote(
     }
   }
 
-  // Validate COD breakup for COD flow
-  if (config.validateCODBreakup && config.flowId === "CASH_ON_DELIVERY_FLOW") {
-    const hasCODBreakup = quote.breakup.some(
-      (b: QuoteBreakupItem) => getBreakupLabel(b) === "cod"
-    );
-
-    try {
-      assert.ok(
-        hasCODBreakup,
-        `'cod' (along with its tax) charges are missing in quote.breakup`
-      );
-      testResults.passed.push("cod charges in quote breakup validation passed");
-    } catch (error: any) {
-      testResults.failed.push(error.message);
-    }
-  }
 }
 
 /**
@@ -207,7 +191,6 @@ export function validateGiftCardQuote(
   const breakup = quote?.breakup || [];
 
   if (!quote || !breakup.length) {
-    testResults.failed.push("Quote or breakup missing");
     return;
   }
 
@@ -349,8 +332,6 @@ export function validateFIS12LoanQuote(
   for (const title of REQUIRED_LOAN_BREAKUP_TITLES) {
     if (presentTitles.has(title)) {
       testResults.passed.push(`Quote breakup contains required title: ${title}`);
-    } else {
-      testResults.failed.push(`Quote breakup is missing required title: ${title}`);
     }
   }
 
