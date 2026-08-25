@@ -189,7 +189,7 @@ export class ReportService {
         flowNames.map(async (flowName) => {
           const txnId = flowMap[flowName];
           if (!txnId) {
-            console.warn(`No transaction ID found for flow: ${flowName}`);
+            logger.warning(`No transaction ID found for flow: ${flowName}`);
             return [flowName, null] as const;
           }
 
@@ -202,7 +202,7 @@ export class ReportService {
             );
             return [flowName, data] as const;
           } catch (error) {
-            console.error(
+            logger.error(
               `Failed to fetch current state for flow ${flowName}:`,
               error
             );
@@ -212,7 +212,7 @@ export class ReportService {
       );
       return Object.fromEntries(entries);
     } catch (error) {
-      console.error("Error in fetchCurrentStates:", error);
+      logger.error("Error in fetchCurrentStates:", error);
       throw new Error(
         `Failed to fetch current states for session ${sessionId}`
       );

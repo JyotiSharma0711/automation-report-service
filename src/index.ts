@@ -21,9 +21,6 @@ try {
   logger.error(String(err));
 }
 
-// Middleware setup
-app.use(express.json());
-
 // Routes
 app.use("/", Router);
 

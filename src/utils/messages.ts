@@ -48,6 +48,23 @@ export const MESSAGES = {
     failedToGenerateReport: "Failed to generate report",
     generic500: "Something went wrong!",
   },
+  logsController: {
+    missingTransactionId: "Missing transaction_id in query parameters",
+    transactionIdRequired: "transaction_id is required",
+    internalServerError: "Internal server error",
+  },
+  flowData: {
+    missingRequiredFields: "subscriberId, domain and version are required",
+    checkingDomain: "fetchFlowData: checking domain",
+    internalWorkbenchFlowMessage: "This domain/version has an internal workbench flow.",
+    fetchingFromPramaan: "Fetching flow data from Pramaan",
+    fetchError: "fetchFlowData: error",
+  },
+  callback: {
+    missingData: "Missing data in callback",
+    dataBaseUrlNotConfigured: "DATA_BASE_URL not defined in environment variables",
+    reportForwardedSuccessfully: "Report forwarded successfully",
+  },
 };
 
 export type Messages = typeof MESSAGES;

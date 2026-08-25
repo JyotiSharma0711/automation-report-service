@@ -100,7 +100,7 @@ export async function getPayloadsByTransactionAndSession(
 
     return filteredPayloads;
   } catch (error) {
-    console.error(
+    logger.error(
       `Error fetching payloads for transactionId ${transactionId}:`,
       error
     );
