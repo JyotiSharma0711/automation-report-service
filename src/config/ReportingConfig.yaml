@@ -3121,6 +3121,162 @@ domains:
                 - on_cancel
                 - on_update
 
+              # --- pramaan-validation-parity skill: added below, previously unwired ---
+              # Sequence derived from this flow's own automation-specifications fixture
+              # (config/flows/PURCHASE FINANCE/Purchase_Finance_With_AA_With_IGM_v-1_0_0_.yaml,
+              # `steps[].api` field) rather than assumed from the sibling: it is the sibling
+              # Purchase_Finance_With_AA sequence plus an issue -> on_issue -> on_issue_status
+              # tail. NOTE: the fixture has one more trailing `issue` step after
+              # `on_issue_status` with no matching `on_issue`/`on_issue_status` after it and
+              # no other flow file explains it — deliberately left OUT of this sequence rather
+              # than guessed at; see the delivery report for what to confirm with whoever owns
+              # the spec.
+              Purchase_Finance_With_AA_With_IGM(v-1.0.0):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - select
+                - on_select
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - confirm
+                - on_confirm
+                - update
+                - on_update
+                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+              # Sequence = sibling Purchase_Finance_Without_AA + issue/on_issue/on_issue_status
+              # tail, same trailing-`issue`-omitted caveat as above.
+              Purchase_Finance_Without_AA_With_IGM(v-1.0.0):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - select
+                - on_select
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - confirm
+                - on_confirm
+                - update
+                - on_update
+                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+              # Sequence = sibling Purchase_Finance_Single_Redirection_With_AA, EXCEPT this
+              # IGM variant's fixture has an active status/on_status pair where the sibling
+              # has it commented out (inactive) at the same position — verified independently
+              # from this flow's own fixture file, not copied from the sibling. Plus the same
+              # issue/on_issue/on_issue_status tail as the other three, trailing-issue omitted.
+              Purchase_Finance_Single_Redirection_With_AA_With_IGM(v-1.0.0):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - status
+                - on_status
+                - select
+                - on_select
+                - init
+                - on_init
+                - confirm
+                - on_confirm
+                - update
+                - on_update
+                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+              # Sequence = sibling Purchase_Finance_Single_Redirection_Without_AA, same active
+              # status/on_status pair (see note above) plus the issue tail.
+              Purchase_Finance_Single_Redirection_Without_AA_With_IGM(v-1.0.0):
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - HTML_FORM
+                - search
+                - on_search
+                - select
+                - on_select
+                - HTML_FORM
+                - select
+                - on_select
+                - DYNAMIC_FORM
+                - on_status
+                - status
+                - on_status
+                - select
+                - on_select
+                - init
+                - on_init
+                - confirm
+                - on_confirm
+                - update
+                - on_update
+                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+
             optional_flows:
               - Purchase_Finance_Without_AA
               - Purchase_Finance_Single_Redirection_Without_AA
@@ -3136,6 +3292,10 @@ domains:
               - Purchase_Finance_With_AA_Missed_EMI_Payment
               - Purchase_Finance_With_AA_Pre_Part_Payment
               - Purchase_Finance_With_AA_Cancellation
+              - Purchase_Finance_With_AA_With_IGM(v-1.0.0)
+              - Purchase_Finance_Without_AA_With_IGM(v-1.0.0)
+              - Purchase_Finance_Single_Redirection_With_AA_With_IGM(v-1.0.0)
+              - Purchase_Finance_Single_Redirection_Without_AA_With_IGM(v-1.0.0)
             validationModules: "../validations/ONDC:FIS12/validator#validate"
       "2.2.0":
         usecases:

@@ -1,7 +1,8 @@
-import { Payload } from "../types/payload";
+import { Payload, TestResult } from "../types/payload";
 import logger from "@ondc/automation-logger";
 import { runValidations } from "../validations/shared/schemaValidator";
-import { contextValidators } from "../validations/shared/contextValidator";
+import { contextValidators, ExpectedContext } from "../validations/shared/contextValidator";
+import { checkFlowContinuity } from "../validations/shared/flowContinuityValidators";
 
 // A function to dynamically load and execute a validation function based on the provided module path and function name
 const dynamicValidator = async (
@@ -82,7 +83,17 @@ export const checkPayload = async (
   sessionId: string,
   flowId: string,
   domainConfig: any,
-  usecaseId?: string
+  usecaseId?: string,
+  // pramaan-validation-parity skill: everything already processed for this flow, before
+  // `element`, in chronological order — the input the old one-payload-at-a-time signature
+  // couldn't carry. Optional so every existing caller keeps compiling; callers that don't
+  // pass it just don't get cross-call continuity checks for that payload.
+  priorPayloadsInFlow?: Payload[],
+  // pramaan-validation-parity skill: what the session/domainConfig independently knows this
+  // payload's domain/version SHOULD be, so context:domain-exact-match and
+  // context:version-exact-match have something real to compare against instead of comparing
+  // the payload to itself. See contextValidator.ts's ExpectedContext doc comment.
+  expectedDomainVersion?: ExpectedContext
 ): Promise<object> => {
   logger.info("Entering checkPayload function for test cases.", {
     domain,
@@ -91,7 +102,7 @@ export const checkPayload = async (
     usecaseId,
   });
   // 0) Always validate common context before any domain/action-specific checks
-  const commonCtxResult = await runValidations(contextValidators(), element?.jsonRequest);
+  const commonCtxResult = await runValidations(contextValidators(expectedDomainVersion), element?.jsonRequest);
   if (!commonCtxResult.ok) {
     return {
       response: {},
@@ -100,14 +111,32 @@ export const checkPayload = async (
     };
   }
 
+  // 0b) pramaan-validation-parity skill: cross-call continuity checks (message_id uniqueness,
+  // timestamp monotonicity, bap/bpp id+uri stability) — see flowContinuityValidators.ts.
+  // Every domain gets these for free; failures here don't block the domain-specific checks
+  // below the way a context failure does, they're just merged into the final result, so a
+  // continuity issue doesn't hide whatever else the payload gets right or wrong.
+  const continuityResult = checkFlowContinuity(element, priorPayloadsInFlow ?? []);
+
   // Get the module path and function name based on the version, or fall back to the default configuration
   const modulePathWithFunc = domainConfig?.validationModules;
   // Call the dynamicValidator to load and execute the validation function for the given domain, element, and action
-  return dynamicValidator(
+  const domainResult = await dynamicValidator(
     modulePathWithFunc,
     element,
     sessionId,
     flowId,
     usecaseId
   );
+
+  if (continuityResult.passed.length === 0 && continuityResult.failed.length === 0) {
+    return domainResult;
+  }
+
+  const domainTestResult = domainResult as Partial<TestResult> | undefined;
+  return {
+    response: domainTestResult?.response ?? {},
+    passed: [...(domainTestResult?.passed ?? []), ...continuityResult.passed],
+    failed: [...(domainTestResult?.failed ?? []), ...continuityResult.failed],
+  };
 };

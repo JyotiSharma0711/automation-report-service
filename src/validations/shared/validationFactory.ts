@@ -95,6 +95,34 @@ function parseTermToYears(term: string): number {
 }
 
 /**
+ * pramaan-validation-parity skill: ported from Pramaan creditBuyerNPTest/v2.2.0/confirm.js
+ * (`tags[tagIndex].display` should equal `false`). BAP_TERMS/BPP_TERMS are terms-of-engagement
+ * tags meant for machine consumption, not buyer-facing display — report-service's existing
+ * BAP_TERMS/BPP_TERMS checks below validate `descriptor.code` and `list` contents but never
+ * checked the tag's own `display` field. Shared here so every call site below can reuse it
+ * the same way they already reuse validateSettlementAmount.
+ * @param tag - The BAP_TERMS or BPP_TERMS tag object itself (not its `.list`)
+ * @param tagType - Type of tag being validated, for the message
+ * @param testResults - TestResult object to add validation results
+ * @param contextLabel - Optional prefix for the message (e.g. "Payment 0: ")
+ */
+function checkTagDisplayFalse(
+  tag: any,
+  tagType: "BAP_TERMS" | "BPP_TERMS",
+  testResults: TestResult,
+  contextLabel: string = ""
+): void {
+  if (tag?.display === undefined) return; // presence isn't this check's job, don't invent a failure
+  if (tag.display === false) {
+    testResults.passed.push(`${contextLabel}${tagType}.display is correctly false`);
+  } else {
+    testResults.failed.push(
+      `${contextLabel}${tagType}.display must be false (terms tags are not for buyer-facing display), found ${JSON.stringify(tag.display)}`
+    );
+  }
+}
+
+/**
  * Helper function to validate SETTLEMENT_AMOUNT calculation
  * Supports three BUYER_FINDER_FEES_TYPE values:
  * - "amount": Flat amount in INR (SETTLEMENT_AMOUNT = BUYER_FINDER_FEES_AMOUNT)
@@ -716,6 +744,7 @@ function validatePurchaseFinanceBapTerms(
     );
     return;
   }
+  checkTagDisplayFalse(bapTerms, "BAP_TERMS", testResults);
 
   if (!bapTerms.list || !Array.isArray(bapTerms.list)) {
     testResults.failed.push("BAP_TERMS list is missing or invalid");
@@ -1378,6 +1407,7 @@ function validatePurchaseFinanceInit(
       );
       return;
     }
+    checkTagDisplayFalse(bapTerms, "BAP_TERMS", testResults, `Payment ${paymentIndex}: `);
 
     if (!bapTerms.list || !Array.isArray(bapTerms.list)) {
       testResults.failed.push(
@@ -2047,6 +2077,7 @@ function validatePurchaseFinanceConfirm(
       (tag: any) => tag.descriptor?.code === "BAP_TERMS"
     );
     if (bapTerms) {
+      checkTagDisplayFalse(bapTerms, "BAP_TERMS", testResults, `Payment ${paymentIndex}: `);
       if (!bapTerms.list || !Array.isArray(bapTerms.list)) {
         testResults.failed.push(
           `Payment ${paymentIndex}: BAP_TERMS list is missing or invalid`
@@ -2100,6 +2131,7 @@ function validatePurchaseFinanceConfirm(
       (tag: any) => tag.descriptor?.code === "BPP_TERMS"
     );
     if (bppTerms) {
+      checkTagDisplayFalse(bppTerms, "BPP_TERMS", testResults, `Payment ${paymentIndex}: `);
       if (!bppTerms.list || !Array.isArray(bppTerms.list)) {
         testResults.failed.push(
           `Payment ${paymentIndex}: BPP_TERMS list is missing or invalid`

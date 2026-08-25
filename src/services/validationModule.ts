@@ -421,13 +421,21 @@ async function processPayloads(
   flowId: string,
   domainConfig: DomainConfig,
   requiredSequence?: string[],
-  usecaseId?: string
+  usecaseId?: string,
+  // pramaan-validation-parity skill: what this flow's domain/version is supposed to be,
+  // independent of any single payload — threaded down to checkPayload's
+  // context:domain-exact-match / context:version-exact-match checks.
+  expectedDomainVersion?: { domain?: string; version?: string }
 ): Promise<Record<string, string>> {
   const messages: Record<string, string> = {};
   const actionCounters = { ...INITIAL_ACTION_COUNTERS };
   let payloadIndex = 0; // Track actual payloads
   let htmlFormCounter = 0; // Track HTML_FORM occurrences
   let dynamicFormCounter = 0; // Track DYNAMIC_FORM occurrences
+  // pramaan-validation-parity skill: everything actually checked so far in this flow, in
+  // processing order — passed to checkPayload so it can run cross-call continuity checks.
+  // Built incrementally below, both in the sequence-order branch and the fallback branch.
+  const priorPayloadsInFlow: Payload[] = [];
 
   // If we have a required sequence, process in sequence order
   if (requiredSequence && requiredSequence.length > 0) {
@@ -517,7 +525,9 @@ async function processPayloads(
           sessionID,
           flowId,
           domainConfig,
-          usecaseId
+          usecaseId,
+          priorPayloadsInFlow,
+          expectedDomainVersion
         );
 
         messages[`${action}_${actionCounters[action]}`] = JSON.stringify(result);
@@ -525,6 +535,7 @@ async function processPayloads(
       } catch (error) {
         logger.error(`Error occurred for action ${action} at index ${payloadIndex}`, error, { flowId, action, index: payloadIndex });
       }
+      priorPayloadsInFlow.push(element);
 
       payloadIndex++;
     }
@@ -548,7 +559,9 @@ async function processPayloads(
           sessionID,
           flowId,
           domainConfig,
-          usecaseId
+          usecaseId,
+          priorPayloadsInFlow,
+          expectedDomainVersion
         );
 
         messages[`${action}_${actionCounters[action]}`] = JSON.stringify(result);
@@ -556,6 +569,7 @@ async function processPayloads(
       } catch (error) {
         logger.error(`Error occurred for action ${action} at index ${i}`, error, { flowId, action, index: i });
       }
+      priorPayloadsInFlow.push(element);
     }
   }
 
@@ -615,13 +629,21 @@ export async function validationModule(
     const usecaseId = (sessionDetails as any)?.usecaseId
       || (sessionDetails as any)?.usecase_id
       || (sessionDetails as any)?.useCaseId;
+    // pramaan-validation-parity skill: sessionDetails is independently fetched session state
+    // (not read from any single payload), so it's a real "expected" value to check payloads
+    // against — see contextValidator.ts's ExpectedContext doc comment for why this matters.
+    const expectedDomainVersion = sessionDetails
+      ? { domain: sessionDetails.domain, version: sessionDetails.version }
+      : undefined;
+
     const messages = await processPayloads(
       payloads,
       sessionID,
       flowId,
       domainConfig,
       requiredSequence,
-      usecaseId
+      usecaseId,
+      expectedDomainVersion
     );
 
     logger.info(MESSAGES.validations.payloadProcessingDone(flowId), { flowId });
