@@ -53,7 +53,17 @@ export default async function on_select(
         const onSelectItemIds = onSelItems.map(it => it?.id).filter(Boolean) as string[];
         const missingItems = selectItemIds.filter(id => !onSelectItemIds.includes(id));
         const extraItems = onSelectItemIds.filter(id => !selectItemIds.includes(id));
-        
+
+        // pramaan-validation-parity skill: extraItems softened to informational 2026-08-25 —
+        // see gap-patterns.md for the write-up. A BPP legitimately CAN return items in on_select
+        // that weren't in the buyer's select (e.g. an auto-added mandatory/dependent item, a
+        // processing-fee or add-on line item) — this isn't a protocol violation, and
+        // automation-report-pramaan's own creditBuyerNPTest/v2.2.0/select.js does not assert any
+        // item-set equality between select and on_select either, so treating it as a hard FAIL
+        // was report-service going beyond spec/pramaan parity and produced a false failure
+        // (reported by user, item b378d433-96d7-4568-a413-7eabbc50b13f). missingItems stays a
+        // real FAIL: a BPP silently dropping an item the buyer explicitly selected is a genuine
+        // correctness problem, not a benign addition.
         if (missingItems.length === 0 && extraItems.length === 0 && selectItemIds.length > 0) {
           result.passed.push(`All items from select (${selectItemIds.length}) are present in on_select`);
         } else {
@@ -61,10 +71,10 @@ export default async function on_select(
             result.failed.push(`Items from select missing in on_select: ${missingItems.join(", ")}`);
           }
           if (extraItems.length > 0) {
-            result.failed.push(`Extra items in on_select not present in select: ${extraItems.join(", ")}`);
+            result.passed.push(`on_select includes additional item(s) beyond select (informational, not a failure): ${extraItems.join(", ")}`);
           }
         }
-        
+
         // Validate form ID consistency if xinput is present
         await validateFormIdIfXinputPresent(message, sessionID, flowId, txnId, "on_select", result);
       }
