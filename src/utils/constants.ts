@@ -737,23 +737,23 @@ export const FLOW_ID_MAP: Record<
   },
   "ONDC:FIS13": {
     "2.0.0": {
-      "transit-insurance": {
+      "TRANSIT INSURANCE": {
         "Discovery_of_Insurer_Providers_and_Master_Policies": "INS_SGRTD_1",
         "Discovery_of_Products_from_Master_Policies (Transit Insurance)": "INS_SGRTD_2",
-        "Purchase_Journey_Transit_Insurance": "INS_20",
+        "Purchase_Journey_Transit_Insurance": "INS_SGRTD_4",
         "CD_Balance_Error_Transit_Insurance": "INS_23"
       },
-      "accidental-insurance": {
+      "ACCIDENTAL INSURANCE": {
         "Discovery_of_Insurer_Providers_and_Master_Policies": "INS_SGRTD_1",
         "Discovery_of_Products_from_Master_Policies (Accidental Insurance)": "INS_SGRTD_2",
         "Purchase_Journey_Accidental_Insurance": "INS_SGRTD_3",
-        "CD_Balance_Error_Transit_Insurance": "INS_23"
+        "CD_Balance_Error_Accidental_Insurance": "INS_23"
 
       },
-      "hospicash-insurance": {
+      "HOSPICASH INSURANCE": {
         "Discovery_of_Insurer_Providers_and_Master_Policies": "INS_SGRTD_1",
         "Discovery_of_Products_from_Master_Policies (Hospicash Insurance)": "INS_SGRTD_2",
-        "Purchase_Journey_Hospicash_Insurance": "INS_21",
+        "Purchase_Journey_Hospicash_Insurance": "INS_SGRTD_5",
         "CD_Balance_Error_Hospicash_Insurance": "INS_23"
       }
     }
@@ -786,9 +786,9 @@ export const typeMapping: Record<string, string> = {
   "Intercity": "INTERCITY",
   "unreserved-entry-pass": "ENTRY_PASS",
   "Hotel-Booking": "ACCOMMODATION",
-  "transit-insurance": "SACHET_INSURANCE",
-  "accidental-insurance": "SACHET_INSURANCE",
-  "hospicash-insurance": "SACHET_INSURANCE",
+  "TRANSIT INSURANCE": "SACHET_INSURANCE",
+  "ACCIDENTAL INSURANCE": "SACHET_INSURANCE",
+  "HOSPICASH INSURANCE": "SACHET_INSURANCE",
   "Logistics (NIC2004:60232)": "LOGISTICS",
   "RECONCILIATION": "RECONCILIATION",
 };
