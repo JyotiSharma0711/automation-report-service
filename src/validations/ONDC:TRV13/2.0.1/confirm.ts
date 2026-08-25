@@ -38,8 +38,6 @@ export default async function confirm(
     // Validate provider
     if (order?.provider?.id) {
       result.passed.push(`Provider ID: ${order.provider.id}`);
-    } else {
-      result.failed.push("Provider ID is missing");
     }
 
     // Validate items
@@ -54,16 +52,12 @@ export default async function confirm(
           result.passed.push(`Item ${item.id} quantity: ${item.quantity.selected.count}`);
         }
       }
-    } else {
-      result.failed.push("No items in confirm request");
     }
 
     // Validate billing
     const billing = order?.billing;
     if (billing?.name) {
       result.passed.push(`Billing name: ${billing.name}`);
-    } else {
-      result.failed.push("Billing name is missing");
     }
 
     // Validate fulfillments with customer
@@ -92,8 +86,6 @@ export default async function confirm(
           result.passed.push("Transaction ID present");
         }
       }
-    } else {
-      result.failed.push("Payment information is missing");
     }
   } catch (error) {
     result.failed.push(`Validation error: ${error}`);

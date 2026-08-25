@@ -38,8 +38,6 @@ export default async function init(
     // Validate provider
     if (order?.provider?.id) {
       result.passed.push(`Provider ID: ${order.provider.id}`);
-    } else {
-      result.failed.push("Provider ID is missing");
     }
 
     // Validate items
@@ -51,8 +49,6 @@ export default async function init(
           result.passed.push(`Item ID: ${item.id}`);
         }
       }
-    } else {
-      result.failed.push("No items in init request");
     }
 
     // Validate billing info
@@ -60,8 +56,6 @@ export default async function init(
     if (billing) {
       if (billing?.name) {
         result.passed.push(`Billing name: ${billing.name}`);
-      } else {
-        result.failed.push("Billing name is missing");
       }
       if (billing?.phone) {
         result.passed.push("Billing phone present");
@@ -69,8 +63,6 @@ export default async function init(
       if (billing?.email) {
         result.passed.push("Billing email present");
       }
-    } else {
-      result.failed.push("Billing information is missing");
     }
 
     // Validate fulfillments

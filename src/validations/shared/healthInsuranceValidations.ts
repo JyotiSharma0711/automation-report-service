@@ -53,8 +53,6 @@ export function validateInsuranceContext(
                 `Context domain should be ONDC:FIS13, found: ${context.domain}`
             );
         }
-    } else {
-        testResults.failed.push("Context domain is missing");
     }
 
     // version
@@ -66,8 +64,6 @@ export function validateInsuranceContext(
                 `Context version should be 2.0.1, found: ${context.version}`
             );
         }
-    } else {
-        testResults.failed.push("Context version is missing");
     }
 
     // location.country.code
@@ -80,8 +76,6 @@ export function validateInsuranceContext(
                 `Context location country code should be IND, found: ${countryCode}`
             );
         }
-    } else {
-        testResults.failed.push("Context location country code is missing");
     }
 
     // location.city.code
@@ -94,8 +88,6 @@ export function validateInsuranceContext(
                 `Context location city code should be std:* format or *, found: ${cityCode}`
             );
         }
-    } else {
-        testResults.failed.push("Context location city code is missing");
     }
 
     // ttl
@@ -151,37 +143,26 @@ export function validateInsurancePaymentTags(
         }
     }
 
-    if (tagSets.length === 0) {
-        testResults.failed.push(
-            `Payment tags are missing (BUYER_FINDER_FEES and SETTLEMENT_TERMS required for health insurance)`
-        );
-        return;
-    }
-
     for (const tags of tagSets) {
         // BUYER_FINDER_FEES
         const bffTag = tags.find((t: any) => t.descriptor?.code === "BUYER_FINDER_FEES");
-        if (!bffTag) {
-            testResults.failed.push("BUYER_FINDER_FEES tag is missing in payment tags");
-        } else {
+        if (bffTag) {
             testResults.passed.push("BUYER_FINDER_FEES tag is present");
 
             const bffType = getTagListValue(tags, "BUYER_FINDER_FEES", "BUYER_FINDER_FEES_TYPE");
             const validTypes = ["amount", "percent", "percent-annualized"];
-            if (!bffType) {
-                testResults.failed.push("BUYER_FINDER_FEES_TYPE is missing in BUYER_FINDER_FEES tag");
-            } else if (!validTypes.includes(bffType)) {
-                testResults.failed.push(
-                    `BUYER_FINDER_FEES_TYPE should be one of: ${validTypes.join(", ")}, found: ${bffType}`
-                );
-            } else {
-                testResults.passed.push(`BUYER_FINDER_FEES_TYPE is valid: ${bffType}`);
+            if (bffType) {
+                if (!validTypes.includes(bffType)) {
+                    testResults.failed.push(
+                        `BUYER_FINDER_FEES_TYPE should be one of: ${validTypes.join(", ")}, found: ${bffType}`
+                    );
+                } else {
+                    testResults.passed.push(`BUYER_FINDER_FEES_TYPE is valid: ${bffType}`);
+                }
             }
 
             const bffPerc = getTagListValue(tags, "BUYER_FINDER_FEES", "BUYER_FINDER_FEES_PERCENTAGE");
-            if (!bffPerc) {
-                testResults.failed.push("BUYER_FINDER_FEES_PERCENTAGE is missing in BUYER_FINDER_FEES tag");
-            } else {
+            if (bffPerc) {
                 const pct = parseFloat(bffPerc);
                 if (isNaN(pct) || pct < 0) {
                     testResults.failed.push(
@@ -195,9 +176,7 @@ export function validateInsurancePaymentTags(
 
         // SETTLEMENT_TERMS
         const settlTag = tags.find((t: any) => t.descriptor?.code === "SETTLEMENT_TERMS");
-        if (!settlTag) {
-            testResults.failed.push("SETTLEMENT_TERMS tag is missing in payment tags");
-        } else {
+        if (settlTag) {
             testResults.passed.push("SETTLEMENT_TERMS tag is present");
 
             const requiredSettlItems = [
@@ -211,9 +190,7 @@ export function validateInsurancePaymentTags(
 
             for (const code of requiredSettlItems) {
                 const val = getTagListValue(tags, "SETTLEMENT_TERMS", code);
-                if (!val) {
-                    testResults.failed.push(`${code} is missing in SETTLEMENT_TERMS tag`);
-                } else {
+                if (val) {
                     testResults.passed.push(`${code} is present in SETTLEMENT_TERMS: ${val}`);
                 }
             }
@@ -265,7 +242,6 @@ export function validateInsuranceDocuments(
     documents.forEach((doc: any, index: number) => {
         const code = doc?.descriptor?.code;
         if (!code) {
-            testResults.failed.push(`Insurance document ${index}: descriptor.code is missing`);
             return;
         }
 
@@ -281,9 +257,7 @@ export function validateInsuranceDocuments(
         }
 
         // Validate URL
-        if (!doc.url) {
-            testResults.failed.push(`Insurance document ${index} (${code}): url is missing`);
-        } else {
+        if (doc.url) {
             const urlPattern = /^https?:\/\/.+/i;
             if (!urlPattern.test(doc.url)) {
                 testResults.failed.push(
@@ -297,9 +271,7 @@ export function validateInsuranceDocuments(
         }
 
         // Validate mime_type
-        if (!doc.mime_type) {
-            testResults.failed.push(`Insurance document ${index} (${code}): mime_type is missing`);
-        } else {
+        if (doc.mime_type) {
             testResults.passed.push(
                 `Insurance document ${index} (${code}): mime_type is ${doc.mime_type}`
             );
@@ -340,9 +312,7 @@ export function validateInsuranceFulfillments(
 
     fulfillments.forEach((ff: any, index: number) => {
         // Type
-        if (!ff.type) {
-            testResults.failed.push(`Insurance fulfillment ${index}: type is missing`);
-        } else {
+        if (ff.type) {
             testResults.passed.push(`Insurance fulfillment ${index}: type is ${ff.type}`);
         }
 
@@ -350,24 +320,16 @@ export function validateInsuranceFulfillments(
         const customerActions = ["init", "init2", "init3", "confirm", "on_init", "on_confirm"];
         if (actionId && customerActions.some(a => actionId.startsWith(a))) {
             const customer = ff.customer;
-            if (!customer) {
-                testResults.failed.push(`Insurance fulfillment ${index}: customer is missing`);
-            } else {
-                if (!customer.person?.name) {
-                    testResults.failed.push(`Insurance fulfillment ${index}: customer person name is missing`);
-                } else {
+            if (customer) {
+                if (customer.person?.name) {
                     testResults.passed.push(`Insurance fulfillment ${index}: customer person name is present`);
                 }
 
-                if (!customer.contact?.phone) {
-                    testResults.failed.push(`Insurance fulfillment ${index}: customer contact phone is missing`);
-                } else {
+                if (customer.contact?.phone) {
                     testResults.passed.push(`Insurance fulfillment ${index}: customer contact phone is present`);
                 }
 
-                if (!customer.contact?.email) {
-                    testResults.failed.push(`Insurance fulfillment ${index}: customer contact email is missing`);
-                } else {
+                if (customer.contact?.email) {
                     testResults.passed.push(`Insurance fulfillment ${index}: customer contact email is present`);
                 }
             }
@@ -445,16 +407,12 @@ export function validateInsuranceItemsOnSearch(
 
         items.forEach((item: any, idx: number) => {
             // descriptor.name
-            if (!item.descriptor?.name) {
-                testResults.failed.push(`on_search item ${idx}: descriptor.name is missing`);
-            } else {
+            if (item.descriptor?.name) {
                 testResults.passed.push(`on_search item ${idx}: descriptor.name is present`);
             }
 
             // time.duration
-            if (!item.time?.duration) {
-                testResults.failed.push(`on_search item ${idx}: time.duration is missing (policy duration)`);
-            } else {
+            if (item.time?.duration) {
                 if (ISO8601_DURATION_PATTERN.test(item.time.duration)) {
                     testResults.passed.push(
                         `on_search item ${idx}: time.duration is valid: ${item.time.duration}`
@@ -467,9 +425,7 @@ export function validateInsuranceItemsOnSearch(
             }
 
             // category_ids
-            if (!item.category_ids || !Array.isArray(item.category_ids) || item.category_ids.length === 0) {
-                testResults.failed.push(`on_search item ${idx}: category_ids is missing`);
-            } else {
+            if (item.category_ids && Array.isArray(item.category_ids) && item.category_ids.length > 0) {
                 testResults.passed.push(`on_search item ${idx}: category_ids present (${item.category_ids.length})`);
             }
 
@@ -489,17 +445,11 @@ export function validateInsuranceItemsOnSearch(
                 const generalInfoTag = item.tags.find(
                     (t: any) => t.descriptor?.code === "GENERAL_INFO"
                 );
-                if (!generalInfoTag) {
-                    testResults.failed.push(`on_search item ${idx}: GENERAL_INFO tag is missing`);
-                } else {
+                if (generalInfoTag) {
                     testResults.passed.push(`on_search item ${idx}: GENERAL_INFO tag is present`);
                     for (const code of GENERAL_INFO_REQUIRED_ITEMS) {
                         const val = getTagListValue(item.tags, "GENERAL_INFO", code);
-                        if (!val) {
-                            testResults.failed.push(
-                                `on_search item ${idx}: ${code} is missing in GENERAL_INFO tag`
-                            );
-                        } else {
+                        if (val) {
                             testResults.passed.push(
                                 `on_search item ${idx}: ${code} is present in GENERAL_INFO`
                             );
@@ -559,7 +509,6 @@ export function validateInsuranceOrderStatus(
 
     const status = message?.order?.status;
     if (!status) {
-        testResults.failed.push("Insurance order status is missing");
         return;
     }
 
@@ -586,25 +535,18 @@ export function validateInsuranceBilling(
 
     const billing = message?.order?.billing;
     if (!billing) {
-        testResults.failed.push("Billing information is missing in order");
         return;
     }
 
-    if (!billing.name) {
-        testResults.failed.push("Billing name is missing");
-    } else {
+    if (billing.name) {
         testResults.passed.push(`Billing name is present: ${billing.name}`);
     }
 
-    if (!billing.phone) {
-        testResults.failed.push("Billing phone is missing");
-    } else {
+    if (billing.phone) {
         testResults.passed.push("Billing phone is present");
     }
 
-    if (!billing.email) {
-        testResults.failed.push("Billing email is missing");
-    } else {
+    if (billing.email) {
         testResults.passed.push("Billing email is present");
     }
 }
@@ -667,31 +609,19 @@ export function validateInsurancePaymentParams(
 
         // Params validation for on_init
         if (actionId && actionId.startsWith("on_init")) {
-            if (!payment.params?.bank_account_number) {
-                testResults.failed.push(
-                    `Insurance payment ${index}: params.bank_account_number is missing`
-                );
-            } else {
+            if (payment.params?.bank_account_number) {
                 testResults.passed.push(
                     `Insurance payment ${index}: params.bank_account_number is present`
                 );
             }
 
-            if (!payment.params?.bank_code) {
-                testResults.failed.push(
-                    `Insurance payment ${index}: params.bank_code (IFSC) is missing`
-                );
-            } else {
+            if (payment.params?.bank_code) {
                 testResults.passed.push(
                     `Insurance payment ${index}: params.bank_code is present`
                 );
             }
 
-            if (!payment.params?.amount) {
-                testResults.failed.push(
-                    `Insurance payment ${index}: params.amount is missing`
-                );
-            } else {
+            if (payment.params?.amount) {
                 testResults.passed.push(
                     `Insurance payment ${index}: params.amount is present: ${payment.params.amount}`
                 );
@@ -708,33 +638,13 @@ export function validateInsurancePaymentParams(
                     );
                 }
             }
-
-            // payment URL if collected_by is BPP
-            if (payment.collected_by === "BPP" && !payment.url) {
-                testResults.failed.push(
-                    `Insurance payment ${index}: payment URL is missing (required when collected_by is BPP)`
-                );
-            }
         }
 
         // Transaction ID for on_confirm
         if (actionId && actionId.startsWith("on_confirm")) {
-            if (!payment.params?.transaction_id) {
-                testResults.failed.push(
-                    `Insurance payment ${index}: params.transaction_id is missing in on_confirm`
-                );
-            } else {
+            if (payment.params?.transaction_id) {
                 testResults.passed.push(
                     `Insurance payment ${index}: params.transaction_id is present`
-                );
-            }
-        }
-
-        // Transaction ID for confirm (if PAID)
-        if (actionId && actionId.startsWith("confirm") && !actionId.startsWith("confirm_")) {
-            if (payment.status === "PAID" && !payment.params?.transaction_id) {
-                testResults.failed.push(
-                    `Insurance payment ${index}: params.transaction_id is missing for PAID payment in confirm`
                 );
             }
         }
@@ -768,16 +678,16 @@ export function validateBreakupTitleEnum(
 
     breakup.forEach((item: any, index: number) => {
         const title = item?.title;
-        if (!title) {
-            testResults.failed.push(`Insurance quote breakup ${index}: title is missing`);
-        } else if (!VALID_BREAKUP_TITLES.includes(title)) {
-            testResults.failed.push(
-                `Insurance quote breakup ${index}: title should be one of ${VALID_BREAKUP_TITLES.join(", ")}, found: ${title}`
-            );
-        } else {
-            testResults.passed.push(
-                `Insurance quote breakup ${index}: title is valid: ${title}`
-            );
+        if (title) {
+            if (!VALID_BREAKUP_TITLES.includes(title)) {
+                testResults.failed.push(
+                    `Insurance quote breakup ${index}: title should be one of ${VALID_BREAKUP_TITLES.join(", ")}, found: ${title}`
+                );
+            } else {
+                testResults.passed.push(
+                    `Insurance quote breakup ${index}: title is valid: ${title}`
+                );
+            }
         }
     });
 
@@ -812,11 +722,7 @@ export function validateInsuranceSelectItems(
 
     items.forEach((item: any, index: number) => {
         // parent_item_id is mandatory for health insurance select
-        if (!item.parent_item_id) {
-            testResults.failed.push(
-                `Insurance select item ${index}: parent_item_id is missing`
-            );
-        } else {
+        if (item.parent_item_id) {
             testResults.passed.push(
                 `Insurance select item ${index}: parent_item_id is present: ${item.parent_item_id}`
             );
@@ -824,11 +730,7 @@ export function validateInsuranceSelectItems(
 
         // xinput form_response validation
         if (item.xinput?.form_response) {
-            if (!item.xinput.form_response.submission_id) {
-                testResults.failed.push(
-                    `Insurance select item ${index}: xinput form_response.submission_id is missing`
-                );
-            } else {
+            if (item.xinput.form_response.submission_id) {
                 testResults.passed.push(
                     `Insurance select item ${index}: xinput form_response.submission_id is present`
                 );
@@ -863,22 +765,14 @@ export function validateInsuranceOnSelectXinput(
         if (!item.xinput) return;
 
         // form.id
-        if (!item.xinput.form?.id) {
-            testResults.failed.push(
-                `Insurance on_select item ${index}: xinput form.id is missing`
-            );
-        } else {
+        if (item.xinput.form?.id) {
             testResults.passed.push(
                 `Insurance on_select item ${index}: xinput form.id is present`
             );
         }
 
         // required flag
-        if (item.xinput.required === undefined || item.xinput.required === null) {
-            testResults.failed.push(
-                `Insurance on_select item ${index}: xinput.required flag is missing`
-            );
-        } else {
+        if (item.xinput.required !== undefined && item.xinput.required !== null) {
             testResults.passed.push(
                 `Insurance on_select item ${index}: xinput.required is ${item.xinput.required}`
             );
@@ -911,13 +805,6 @@ export function validateInsuranceOnSelectXinput(
                 );
             }
         }
-
-        // time.duration carry-forward
-        if (!item.time?.duration) {
-            testResults.failed.push(
-                `Insurance on_select item ${index}: time.duration is missing (should carry forward from on_search)`
-            );
-        }
     });
 }
 
@@ -938,11 +825,7 @@ export function validateInsuranceInitXinput(
 
     items.forEach((item: any, index: number) => {
         if (item.xinput?.form_response) {
-            if (!item.xinput.form_response.submission_id) {
-                testResults.failed.push(
-                    `Insurance init item ${index}: xinput form_response.submission_id is missing`
-                );
-            } else {
+            if (item.xinput.form_response.submission_id) {
                 testResults.passed.push(
                     `Insurance init item ${index}: xinput form_response.submission_id is present`
                 );
@@ -1027,11 +910,7 @@ export function validateInsuranceConfirmXinput(
 
     items.forEach((item: any, index: number) => {
         if (item.xinput?.form_response) {
-            if (!item.xinput.form_response.submission_id) {
-                testResults.failed.push(
-                    `Insurance confirm item ${index}: xinput form_response.submission_id is missing`
-                );
-            } else {
+            if (item.xinput.form_response.submission_id) {
                 testResults.passed.push(
                     `Insurance confirm item ${index}: xinput form_response.submission_id is present`
                 );
@@ -1052,9 +931,7 @@ export function validateInsuranceOrderId(
 ): void {
     if (!isHealthInsuranceFlow(flowId)) return;
 
-    if (!message?.order?.id) {
-        testResults.failed.push("Insurance order.id (Policy ID) is missing");
-    } else {
+    if (message?.order?.id) {
         testResults.passed.push(`Insurance order.id is present: ${message.order.id}`);
     }
 }

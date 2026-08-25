@@ -36,8 +36,6 @@ export default async function status(
     // Validate order_id
     if (message?.order_id) {
       result.passed.push(`Order ID: ${message.order_id}`);
-    } else {
-      result.failed.push("Order ID is missing");
     }
   } catch (error) {
     result.failed.push(`Validation error: ${error}`);

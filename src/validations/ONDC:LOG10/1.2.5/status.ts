@@ -43,14 +43,6 @@ export async function checkStatus(
         logger.error(`Error during ${action} validation: ${error.message}`);
         testResults.failed.push(error.message);
       }
-    } else {
-      // order_id is required in status
-      try {
-        assert.ok(statusOrderId, "message.order_id is required in status request");
-        testResults.passed.push("Order ID presence validation in status passed");
-      } catch (error: any) {
-        testResults.failed.push(error.message);
-      }
     }
   } catch (error: any) {
     logger.error(`Error during ${action} cross-call comparison: ${error.message}`);

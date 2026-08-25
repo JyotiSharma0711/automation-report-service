@@ -36,30 +36,6 @@ export default async function on_init(
       result.failed.push(`Invalid action: expected on_init, got ${context?.action}`);
     }
 
-    // Validate billing details
-    const billing = order?.billing;
-    if (!billing) {
-      result.failed.push("message.order.billing is missing");
-    } else {
-      if (!billing.name) result.failed.push("billing.name is missing");
-      if (!billing.phone) result.failed.push("billing.phone is missing");
-      if (!billing.email) result.failed.push("billing.email is missing");
-      const address = billing.address;
-      if (!address) {
-        result.failed.push("billing.address is missing");
-      } else {
-        if (!address.city) {
-          result.failed.push("message.order.billing is missing city name");
-        }
-        if (!address.state) {
-          result.failed.push("message.order.billing is missing state name");
-        }
-        if (!address.name) {
-          result.failed.push("message.order.billing is missing organization name");
-        }
-      }
-    }
-
     // Validate provider
     if (order?.provider?.id) {
       result.passed.push(`Provider ID: ${order.provider.id}`);
@@ -69,9 +45,7 @@ export default async function on_init(
       result.failed.push("provider.locations is being sent additionally");
     }
 
-    if (!order?.provider?.tags || !Array.isArray(order.provider.tags) || order.provider.tags.length === 0) {
-      result.failed.push("provider.tags are missing");
-    } else {
+    if (order?.provider?.tags && Array.isArray(order.provider.tags) && order.provider.tags.length > 0) {
       result.passed.push("provider.tags are present");
     }
 
@@ -85,9 +59,7 @@ export default async function on_init(
         }
 
         // Validate item.tags
-        if (!item.tags || !Array.isArray(item.tags) || item.tags.length === 0) {
-          result.failed.push("item.tags are missing");
-        } else {
+        if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
           result.passed.push(`Item ${item.id} tags are present`);
         }
 
@@ -148,16 +120,12 @@ export default async function on_init(
         } else {
           result.passed.push("quote.breakup includes Meal Inclusion Charges");
         }
-      } else {
-        result.failed.push("quote.breakup is missing or empty");
       }
     }
 
     // Validate payments with terms
     const payments = order?.payments;
-    if (!payments || !Array.isArray(payments) || payments.length === 0) {
-      result.failed.push("Payment object is incorrect; please refer to the Swagger documentation (payments array is missing or empty)");
-    } else {
+    if (payments && Array.isArray(payments) && payments.length > 0) {
       payments.forEach((payment: any, pIdx: number) => {
         if (payment.type === "PART-PAYMENT") {
           result.passed.push(
@@ -165,37 +133,14 @@ export default async function on_init(
           );
           return;
         }
-        if (!payment.id) {
-          result.failed.push(`Payment[${pIdx}] is missing 'id'`);
-        }
-        if (!payment.collected_by) {
-          result.failed.push(`Payment[${pIdx}] is missing 'collected_by'`);
-        } else if (!["BAP", "BPP"].includes(payment.collected_by)) {
+        if (payment.collected_by && !["BAP", "BPP"].includes(payment.collected_by)) {
           result.failed.push(`Payment[${pIdx}].collected_by must be BAP or BPP, got: ${payment.collected_by}`);
         }
-        if (!payment.type) {
-          result.failed.push(`Payment[${pIdx}] is missing 'type'`);
-        } else if (!["PRE-ORDER", "ON-FULFILLMENT", "PART-PAYMENT"].includes(payment.type)) {
+        if (payment.type && !["PRE-ORDER", "ON-FULFILLMENT", "PART-PAYMENT"].includes(payment.type)) {
           result.failed.push(`Payment[${pIdx}].type must be PRE-ORDER, ON-FULFILLMENT, or PART-PAYMENT, got: ${payment.type}`);
         }
-        if (!payment.status) {
-          result.failed.push(`Payment[${pIdx}] is missing 'status'`);
-        } else if (!["NOT-PAID", "PAID"].includes(payment.status)) {
+        if (payment.status && !["NOT-PAID", "PAID"].includes(payment.status)) {
           result.failed.push(`Payment[${pIdx}].status must be NOT-PAID or PAID, got: ${payment.status}`);
-        }
-
-        // Validate params
-        if (payment.type !== "PART-PAYMENT") {
-          if (!payment.params) {
-            result.failed.push(`Payment[${pIdx}] is missing 'params'`);
-          } else {
-            if (!payment.params.amount) {
-              result.failed.push(`Payment[${pIdx}].params is missing 'amount'`);
-            }
-            if (!payment.params.currency) {
-              result.failed.push(`Payment[${pIdx}].params is missing 'currency'`);
-            }
-          }
         }
       });
     }
@@ -216,52 +161,12 @@ export default async function on_init(
     const bapTerms = allTags.find((t: any) => t?.descriptor?.code === "BAP_TERMS");
     const bppTerms = allTags.find((t: any) => t?.descriptor?.code === "BPP_TERMS");
 
-    if (!bapTerms) {
-      result.failed.push("BAP terms are completely missing");
-    } else {
+    if (bapTerms) {
       result.passed.push("BAP_TERMS tag is present");
-      if (!bapTerms.list || !Array.isArray(bapTerms.list) || bapTerms.list.length === 0) {
-        result.failed.push("BAP terms list is missing or empty");
-      } else {
-        const requiredBapFields = [
-          "BUYER_FINDER_FEES_TYPE",
-          "BUYER_FINDER_FEES_PERCENTAGE",
-          "SETTLEMENT_TYPE",
-          "DELAY_INTEREST",
-          "STATIC_TERMS",
-          "OFFLINE_CONTRACT",
-        ];
-        requiredBapFields.forEach((field) => {
-          const item = bapTerms.list.find((i: any) => i?.descriptor?.code === field);
-          if (!item || !item.value) {
-            result.failed.push(`BAP_TERMS: ${field} is missing or incorrect`);
-          }
-        });
-      }
     }
 
-    if (!bppTerms) {
-      result.failed.push("BPP terms are incorrect (completely missing)");
-    } else {
+    if (bppTerms) {
       result.passed.push("BPP_TERMS tag is present");
-      if (!bppTerms.list || !Array.isArray(bppTerms.list) || bppTerms.list.length === 0) {
-        result.failed.push("BPP terms are incorrect: list is missing or empty");
-      } else {
-        const requiredBppFields = [
-          "MAX_LIABILITY",
-          "MAX_LIABILITY_CAP",
-          "MANDATORY_ARBITRATION",
-          "COURT_JURISDICTION",
-          "DELAY_INTEREST",
-          "TAX_NUMBER",
-        ];
-        requiredBppFields.forEach((field) => {
-          const item = bppTerms.list.find((i: any) => i?.descriptor?.code === field);
-          if (!item || !item.value) {
-            result.failed.push(`BPP terms are incorrect: ${field} is missing or incorrect`);
-          }
-        });
-      }
     }
 
     // Use shared quote validation

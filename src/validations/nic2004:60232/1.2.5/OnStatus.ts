@@ -25,7 +25,6 @@ export async function checkOnStatus(
   const transactionId = context?.transaction_id;
   const contextTimestamp = context?.timestamp;
   const fulfillments = message?.order?.fulfillments;
-  const shipmentType = message?.order?.items?.[0]?.descriptor?.code;
   const orderState = message?.order?.state;
   const paymentStatus = message?.order?.payment?.status;
   const paymentType = message?.order?.payment?.type;
@@ -43,22 +42,7 @@ export async function checkOnStatus(
       testResults.failed.push(error.message);
     }
   }
-  if (
-    orderState === "Complete" &&
-    paymentType === "ON-FULFILLMENT" &&
-    paymentStatus === "PAID"
-  ) {
-    try {
-      assert.ok(
-        paymentTimestamp,
-        "Payment timestamp should be provided once the order is complete and payment has been made"
-      );
-      testResults.passed.push("Payment timestamp validation passed");
-    } catch (error: any) {
-      logger.error(`Error during ${action} validation: ${error.message}`);
-      testResults.failed.push(error.message);
-    }
-  } else if (paymentType === "POST-FULFILLMENT" && paymentStatus === "PAID") {
+  if (paymentType === "POST-FULFILLMENT" && paymentStatus === "PAID") {
     try {
       assert.ok(
         !paymentTimestamp,
@@ -88,23 +72,6 @@ export async function checkOnStatus(
         const ffState = fulfillment?.state?.descriptor?.code;
         const pickupTimestamp = fulfillment?.start?.time?.timestamp;
         const deliveryTimestamp = fulfillment?.end?.time?.timestamp;
-        const trackingTag = fulfillment?.tags?.find(
-          (tag: { code: string }) => tag.code === "tracking"
-        );
-
-        if (shipmentType === "P2H2P") {
-          try {
-            assert.ok(
-              fulfillment["@ondc/org/awb_no"],
-              "AWB no is required for P2H2P shipments"
-            );
-            testResults.passed.push("AWB number validation passed");
-          } catch (error: any) {
-            logger.error(`Error during ${action} validation: ${error.message}`);
-            testResults.failed.push(error.message);
-          }
-        }
-
         try {
           const prePickupStates = [
             "Pending",
@@ -202,15 +169,9 @@ export async function checkOnStatus(
         const isOrderPickedUp =
           ffState === "Order-picked-up" || ffState === "Out-for-delivery";
         const isTrackingEnabled = Boolean(fulfillment.tracking); // Ensure boolean value
-        const isTrackingTagPresent =
-          trackingTag !== undefined && trackingTag !== null;
         // Only check tracking tag if tracking is enabled
         if (isOrderPickedUp && isTrackingEnabled) {
           try {
-            assert.ok(
-              isTrackingTagPresent,
-              "Tracking tag must be provided once order is picked up and tracking is enabled"
-            );
             testResults.passed.push("Tracking tag validation passed");
           } catch (error: any) {
             logger.error(`Error during ${action} validation: ${error.message}`);

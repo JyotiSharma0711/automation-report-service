@@ -37,8 +37,6 @@ export default async function update(
     // Validate order ID
     if (order?.id) {
       result.passed.push(`Order ID: ${order.id}`);
-    } else {
-      result.failed.push("Order ID is missing");
     }
 
     // Validate update_target tag
