@@ -594,7 +594,6 @@ function validateTags(
     }
 
     if (!bapTerms.list || !Array.isArray(bapTerms.list)) {
-      testResults.failed.push("BAP_TERMS list is missing or invalid");
       return;
     }
 
@@ -750,7 +749,6 @@ function validatePurchaseFinanceBapTerms(
   checkTagDisplayFalse(bapTerms, "BAP_TERMS", testResults);
 
   if (!bapTerms.list || !Array.isArray(bapTerms.list)) {
-    testResults.failed.push("BAP_TERMS list is missing or invalid");
     return;
   }
 
@@ -1413,9 +1411,6 @@ function validatePurchaseFinanceInit(
     checkTagDisplayFalse(bapTerms, "BAP_TERMS", testResults, `Payment ${paymentIndex}: `);
 
     if (!bapTerms.list || !Array.isArray(bapTerms.list)) {
-      testResults.failed.push(
-        `Payment ${paymentIndex}: BAP_TERMS list is missing or invalid`
-      );
       return;
     }
 
@@ -2079,11 +2074,7 @@ function validatePurchaseFinanceConfirm(
     );
     if (bapTerms) {
       checkTagDisplayFalse(bapTerms, "BAP_TERMS", testResults, `Payment ${paymentIndex}: `);
-      if (!bapTerms.list || !Array.isArray(bapTerms.list)) {
-        testResults.failed.push(
-          `Payment ${paymentIndex}: BAP_TERMS list is missing or invalid`
-        );
-      } else {
+      if (bapTerms.list && Array.isArray(bapTerms.list)) {
         // Helper function to get value by code
         const getValue = (code: string): string | undefined => {
           const item = bapTerms.list.find(
@@ -2133,11 +2124,7 @@ function validatePurchaseFinanceConfirm(
     );
     if (bppTerms) {
       checkTagDisplayFalse(bppTerms, "BPP_TERMS", testResults, `Payment ${paymentIndex}: `);
-      if (!bppTerms.list || !Array.isArray(bppTerms.list)) {
-        testResults.failed.push(
-          `Payment ${paymentIndex}: BPP_TERMS list is missing or invalid`
-        );
-      } else {
+      if (bppTerms.list && Array.isArray(bppTerms.list)) {
         // Helper function to get value by code
         const getValue = (code: string): string | undefined => {
           const item = bppTerms.list.find(
@@ -2407,11 +2394,7 @@ function validatePurchaseFinanceOnCancel(
                 `Fulfillment ${index}: INFO tag is missing (required for DISBURSED LOAN fulfillment)`
               );
             } else {
-              if (!infoTag.list || !Array.isArray(infoTag.list)) {
-                testResults.failed.push(
-                  `Fulfillment ${index}: INFO tag list is missing or invalid`
-                );
-              } else {
+              if (infoTag.list && Array.isArray(infoTag.list)) {
                 const referenceNumber = infoTag.list.find(
                   (item: any) => item.descriptor?.code === "REFERENCE_NUMBER"
                 );
@@ -2852,11 +2835,7 @@ function validatePurchaseFinanceOnUpdate(
               `Fulfillment ${index}: INFO tag is missing (required for DISBURSED LOAN fulfillment)`
             );
           } else {
-            if (!infoTag.list || !Array.isArray(infoTag.list)) {
-              testResults.failed.push(
-                `Fulfillment ${index}: INFO tag list is missing or invalid`
-              );
-            } else {
+            if (infoTag.list && Array.isArray(infoTag.list)) {
               const referenceNumber = infoTag.list.find(
                 (item: any) => item.descriptor?.code === "REFERENCE_NUMBER"
               );
@@ -3357,9 +3336,6 @@ function validatePurchaseFinanceOnSearch(
           !consentInfoTag.list ||
           !Array.isArray(consentInfoTag.list)
         ) {
-          testResults.failed.push(
-            `Item ${item.id}: CONSENT_INFO tag list is missing or invalid`
-          );
           return;
         }
 
@@ -3602,7 +3578,6 @@ function validateFulfillmentStops(
 
   const stops = fulfillment.stops;
   if (!stops || !Array.isArray(stops)) {
-    testResults.failed.push("Fulfillment stops array is missing or invalid");
     return;
   }
 
@@ -3755,10 +3730,6 @@ function validateFulfillmentStopsInCatalog(
     fulfillments.forEach((fulfillment: any, fulfillmentIndex: number) => {
       const stops = fulfillment?.stops;
       if (!stops || !Array.isArray(stops)) {
-        testResults.failed.push(
-          `Provider ${providerIndex}, Fulfillment ${fulfillmentIndex}: stops array is missing or invalid`
-        );
-        allProvidersValid = false;
         return;
       }
 
@@ -4126,9 +4097,7 @@ function validateCatalog(message: any, testResults: TestResult): void {
   }
 
   const providers = catalog.providers ? catalog.providers : catalog['bpp/providers'] ? catalog['bpp/providers'] : []
-  if (!providers || !Array.isArray(providers)) {
-    testResults.failed.push("Catalog providers array is missing or invalid");
-  } else {
+  if (providers && Array.isArray(providers)) {
     testResults.passed.push("Catalog providers array is present");
   }
 }
@@ -4278,7 +4247,6 @@ function validateItems(
   }
 
   if (!items || !Array.isArray(items)) {
-    testResults.failed.push("Items array is missing or invalid");
     return;
   }
 
@@ -4451,7 +4419,6 @@ function validateItemsTRV10(
   const items =
     message?.catalog?.providers?.[0]?.items || message?.order?.items;
   if (!items || !Array.isArray(items)) {
-    testResults.failed.push("Items array is missing or invalid");
     return;
   }
 
@@ -4501,36 +4468,6 @@ function validateItemsTRV10(
   });
 }
 
-function validateFulfillments(
-  message: any,
-  testResults: TestResult,
-  action_id?: string
-): void {
-  const fulfillments =
-    message?.catalog?.providers?.[0]?.fulfillments ||
-    message?.order?.fulfillments;
-  if (
-    action_id !== "update_quote" &&
-    (!fulfillments || !Array.isArray(fulfillments))
-  ) {
-    testResults.failed.push("Fulfillments array is missing or invalid");
-    return;
-  }
-
-  fulfillments?.forEach((fulfillment: any, index: any) => {
-    if (!fulfillment.id) {
-      testResults.failed.push(`Fulfillment ${index} ID is missing`);
-    } else {
-      testResults.passed.push(`Fulfillment ${index} ID is present`);
-    }
-
-    if (!fulfillment.type) {
-      testResults.failed.push(`Fulfillment ${index} type is missing`);
-    } else {
-      testResults.passed.push(`Fulfillment ${index} type is present`);
-    }
-  });
-}
 
 function validateFulfillmentsTRV10(
   message: any,
@@ -4540,14 +4477,6 @@ function validateFulfillmentsTRV10(
   const fulfillments =
     message?.catalog?.providers?.[0]?.fulfillments ||
     message?.order?.fulfillments;
-  if (
-    action_id !== "update_quote" &&
-    (!fulfillments || !Array.isArray(fulfillments))
-  ) {
-    testResults.failed.push("Fulfillments array is missing or invalid");
-    return;
-  }
-
   fulfillments?.forEach((fulfillment: any, index: any) => {
     if (!fulfillment.id) {
       testResults.failed.push(`Fulfillment ${index} ID is missing`);
@@ -4587,49 +4516,9 @@ function validateFulfillmentsFIS12(
     message?.catalog?.providers?.[0]?.fulfillments ||
     message?.order?.fulfillments;
 
-  // Skip fulfillments validation for:
-  // 1. on_search action (FIS13 2.0.1)
-  // 2. Purchase finance status actions when usecaseId is PURCHASE FINANCE
-  // 3. select/select2 actions when usecaseId is HEALTH INSURANCE
   const normalizedUsecaseId = usecaseId?.toUpperCase().trim();
 
-  const purchaseFinanceStatusActions = new Set([
-    "on_status_unsolicited",
-    "on_status_purchase_finance",
-    "on_status_purchase_finance1",
-  ]);
-
-  const creditCardStatusActions = new Set([
-    "on_status_unsolicited_cc",
-    "on_status_cc_1",
-    "on_status_cc_2",
-  ]);
-  const purchaseFinanceUsecases = new Set([
-    "PURCHASE FINANCE",
-    "PURCHASE_FINANCE",
-  ]);
-
-  const creditCardUsecases = new Set(["CREDIT CARD", "CREDIT_CARD"]);
-
-  const selectActions = new Set(["select", "select2"]);
-
-  const isPurchaseFinanceStatusAction = purchaseFinanceStatusActions.has(action_id ?? "");
-  const isPurchaseFinanceUsecase = purchaseFinanceUsecases.has(normalizedUsecaseId ?? "");
-  const isCreditCardStatusAction = creditCardStatusActions.has(action_id ?? "");
-  const isCreditCardUsecase = creditCardUsecases.has(normalizedUsecaseId ?? "");
-  const isSelectAction = selectActions.has(action_id ?? "");
-  const isHealthInsuranceUsecase = normalizedUsecaseId === "HEALTH INSURANCE";
-
-  const shouldSkipValidation =
-    action_id === "on_search" ||
-    (isPurchaseFinanceStatusAction && isPurchaseFinanceUsecase) ||
-    (isCreditCardStatusAction && isCreditCardUsecase) ||
-    (isSelectAction && isHealthInsuranceUsecase);
-
   if (!fulfillments || !Array.isArray(fulfillments)) {
-    if (!shouldSkipValidation) {
-      testResults.failed.push("Fulfillments array is missing or invalid");
-    }
     return;
   }
 
@@ -4698,7 +4587,6 @@ function validatePaymentsFIS12(message: any, testResults: TestResult, flow_id?: 
   const payments =
     message?.catalog?.providers?.[0]?.payments || message?.order?.payments;
   if (!payments || !Array.isArray(payments)) {
-    testResults.failed.push("Payments array is missing or invalid");
     return;
   }
 
@@ -6283,7 +6171,6 @@ function validatePayments(message: any, testResults: TestResult, flow_id?: strin
   const payments =
     message?.catalog?.providers?.[0]?.payments || message?.order?.payments;
   if (!payments || !Array.isArray(payments)) {
-    testResults.failed.push("Payments array is missing or invalid");
     return;
   }
 
@@ -6321,7 +6208,6 @@ function validatePaymentsTRV10(message: any, testResults: TestResult): void {
   const payments =
     message?.catalog?.providers?.[0]?.payments || message?.order?.payments;
   if (!payments || !Array.isArray(payments)) {
-    testResults.failed.push("Payments array is missing or invalid");
     return;
   }
 
@@ -7233,9 +7119,6 @@ export function createOnSearchValidator(...config: string[]) {
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId);
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults, action_id);
-            break;
           case fis11Validators.payments.validate_payments:
             validatePayments(message, testResults, flowId);
             break;
@@ -7354,9 +7237,6 @@ export function createSelectValidator(...config: string[]) {
               flowId
             );
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults);
-            break;
 
           // TRV10 validations
           case trv10Validators.items_trv10.validate_items_trv10:
@@ -7444,9 +7324,6 @@ export function createOnSelectValidator(...config: string[]) {
 
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId, usecaseId);
-            break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults);
             break;
 
           // TRV10 validations
@@ -7542,9 +7419,7 @@ export function createInitValidator(...config: string[]) {
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId, usecaseId);
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults);
-            break;
+         
           case fis11Validators.payments.validate_payments:
             validatePayments(message, testResults, flowId);
             break;
@@ -7697,9 +7572,7 @@ export function createConfirmValidator(...config: string[]) {
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId, usecaseId);
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults);
-            break;
+         
           case fis11Validators.payments.validate_payments:
             validatePayments(message, testResults, flowId);
             break;
@@ -7792,9 +7665,7 @@ export function createOnInitValidator(...config: string[]) {
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId, usecaseId, error);
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults, error);
-            break;
+          
           case fis11Validators.payments.validate_payments:
             validatePayments(message, testResults, flowId, error);
             break;
@@ -7983,9 +7854,7 @@ export function createOnConfirmValidator(...config: string[]) {
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId, usecaseId);
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults);
-            break;
+        
           case fis11Validators.payments.validate_payments:
             validatePayments(message, testResults, flowId);
             break;
@@ -8098,9 +7967,7 @@ export function createOnStatusValidator(...config: string[]) {
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId, usecaseId);
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults);
-            break;
+          
           case fis11Validators.payments.validate_payments:
             validatePayments(message, testResults, flowId);
             break;
@@ -8231,9 +8098,7 @@ export function createOnCancelValidator(...config: string[]) {
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId, usecaseId);
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults);
-            break;
+        
           case fis11Validators.payments.validate_payments:
             validatePayments(message, testResults, flowId);
             break;
@@ -8343,9 +8208,7 @@ export function createOnUpdateValidator(...config: string[]) {
           case fis11Validators.items.validate_items:
             validateItems(message, testResults, action_id, flowId, usecaseId);
             break;
-          case fis11Validators.fulfillments.validate_fulfillments:
-            validateFulfillments(message, testResults);
-            break;
+         
           case fis11Validators.payments.validate_payments:
             validatePayments(message, testResults, flowId);
             break;

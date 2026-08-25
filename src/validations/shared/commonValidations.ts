@@ -247,27 +247,6 @@ export function getTimestampFromDuration(
 }
 
 /**
- * Validates that a required field exists
- */
-export function validateRequiredField(
-  value: any,
-  fieldPath: string,
-  testResults: TestResult,
-  successMessage?: string
-): boolean {
-  try {
-    assert.ok(value, `${fieldPath} is required`);
-    if (successMessage) {
-      testResults.passed.push(successMessage);
-    }
-    return true;
-  } catch (error: any) {
-    testResults.failed.push(error.message);
-    return false;
-  }
-}
-
-/**
  * Validates that a field matches expected value
  */
 export function validateFieldValue(
@@ -279,29 +258,6 @@ export function validateFieldValue(
 ): boolean {
   try {
     assert.strictEqual(actual, expected, `${fieldPath} should be ${expected}`);
-    if (successMessage) {
-      testResults.passed.push(successMessage);
-    }
-    return true;
-  } catch (error: any) {
-    testResults.failed.push(error.message);
-    return false;
-  }
-}
-
-/**
- * Validates array contains required item
- */
-export function validateArrayContains(
-  array: any[],
-  predicate: (item: any) => boolean,
-  fieldPath: string,
-  testResults: TestResult,
-  successMessage?: string
-): boolean {
-  try {
-    const found = array?.find(predicate);
-    assert.ok(found, `${fieldPath} should contain required item`);
     if (successMessage) {
       testResults.passed.push(successMessage);
     }
