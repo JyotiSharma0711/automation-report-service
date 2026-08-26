@@ -4200,103 +4200,233 @@ domains:
         usecases:
           UNIFIED CREDIT:
             flows:
-              business_term_loan_with_offline_online:
+              business_term_loan_with_aa:
+                - search
+                - on_search
                 - search
                 - on_search
                 - select
                 - on_select
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
                 - select
                 - on_select
-                - init
-                - on_init
-                - kyc_form
-                - on_status
-                - init
-                - on_init
-                - loan_aggrement_form
-                - on_status
-                - init
-                - on_init
-                - confirm
                 - on_confirm
-                - on_update
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+
+              business_term_loan_with_aa_with_igm_1.0.0:
+                - search
+                - on_search
+                - search
+                - on_search
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - select
+                - on_select
+                - on_confirm
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
 
               business_term_loan_without_aa:
                 - search
                 - on_search
                 - select
                 - on_select
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
                 - select
                 - on_select
-                - init
-                - on_init
-                - kyc_form
-                - on_status
-                - init
-                - on_init
-                - emandate_form
-                - on_status
-                - init
-                - on_init
-                - loan_aggrement_form
-                - on_status
-                - init
-                - on_init
-                - confirm
                 - on_confirm
-                - on_update
 
-              lamf_credit_line_with_mfc_offline_journey:
+              business_term_loan_without_aa_with_igm_1.0.0:
                 - search
                 - on_search
                 - select
                 - on_select
-                - init
-                - on_init
-                - journey_offline_form
                 - on_status
-                - init
-                - on_init
-                - confirm
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - select
+                - on_select
                 - on_confirm
-                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
 
-              lamf_credit_line_with_mfc:
+              business_term_loan_with_file_upload:
                 - search
                 - on_search
                 - select
                 - on_select
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - select
+                - on_select
+                - on_confirm
+
+              business_term_loan_with_file_upload_with_igm_1.0.0:
+                - search
+                - on_search
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - select
+                - on_select
+                - on_confirm
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
+
+              business_term_loan_with_offline_online_foreclosure:
+                - search
+                - on_search
+                - select
+                - on_select
+                - select
+                - on_select
                 - init
                 - on_init
-                - kyc_form
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
-                - lien_marking_form
-                - on_status
-                - init
-                - on_init
-                - emandate_form
-                - on_status
-                - init
-                - on_init
-                - loan_aggrement_form
+                - DYNAMIC_FORM
                 - on_status
                 - init
                 - on_init
                 - confirm
                 - on_confirm
                 - on_update
+                - update
+                - on_update
+                - on_update
+
+              business_term_loan_with_offline_online_missed_emi:
+                - search
+                - on_search
+                - select
+                - on_select
+                - select
+                - on_select
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - confirm
+                - on_confirm
+                - on_update
+                - update
+                - on_update
+                - on_update
+
+              business_term_loan_with_offline_online_pre_part:
+                - search
+                - on_search
+                - select
+                - on_select
+                - select
+                - on_select
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - DYNAMIC_FORM
+                - on_status
+                - init
+                - on_init
+                - confirm
+                - on_confirm
+                - on_update
+                - update
+                - on_update
+                - on_update
+
+              dedupe_check:
+                - select
+                - on_select
+
+              lamf_credit_line_with_mfc_single_redirection:
+                - search
+                - on_search
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - select
+                - on_select
+                - on_confirm
+
+              lamf_credit_line_with_mfc_single_redirection_with_igm_1.0.0:
+                - search
+                - on_search
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - select
+                - on_select
+                - on_confirm
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
 
               master_search:
                 - search
                 - on_search
             optional_flows:
-              - master_search
+              - business_term_loan_with_aa
+              - business_term_loan_with_aa_with_igm_1.0.0
               - business_term_loan_without_aa
-              - lamf_credit_line_with_mfc
-              - business_term_loan_with_offline_online
-              - lamf_credit_line_with_mfc_offline_journey
+              - business_term_loan_without_aa_with_igm_1.0.0
+              - business_term_loan_with_file_upload
+              - business_term_loan_with_file_upload_with_igm_1.0.0
+              - business_term_loan_with_offline_online_foreclosure
+              - business_term_loan_with_offline_online_missed_emi
+              - business_term_loan_with_offline_online_pre_part
+              - dedupe_check
+              - lamf_credit_line_with_mfc_single_redirection
+              - lamf_credit_line_with_mfc_single_redirection_with_igm_1.0.0
+              - master_search
             validationModules: "../validations/ONDC:FIS12/validator#validate"
   
   ONDC:FIS13:
