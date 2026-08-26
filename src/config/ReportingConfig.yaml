@@ -3827,189 +3827,55 @@ domains:
         usecases:
           GOLD LOAN:
             flows:
-              Gold_Loan_With_Account_Aggregator:
+              Gold_Loan_Offline:
                 - search
                 - on_search
                 - HTML_FORM
                 - select
                 - on_select
-                - HTML_FORM
                 - select
                 - on_select
-                - HTML_FORM
+                - DYNAMIC_FORM
                 - on_status
                 - status
                 - on_status
-                - init
-                - on_init
+                - on_status
                 - confirm
                 - on_confirm
+                - on_status
 
-              Gold_Loan_Without_Account_Aggregator:
+              Gold_Loan_Offline_with_igm_1.0.0:
                 - search
                 - on_search
                 - HTML_FORM
                 - select
                 - on_select
-                - HTML_FORM
                 - select
                 - on_select
-                - HTML_FORM
+                - DYNAMIC_FORM
                 - on_status
                 - status
                 - on_status
-                - init
-                - on_init
+                - on_status
                 - confirm
                 - on_confirm
-
-              Gold_Loan_Foreclosure:
-                - search
-                - on_search
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
                 - on_status
-                - status
-                - on_status
-                - init
-                - on_init
-                - confirm
-                - on_confirm
-                - update
-                - on_update
-                - on_update
-
-              Gold_Loan_Missed_EMI:
-                - search
-                - on_search
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - on_status
-                - status
-                - on_status
-                - init
-                - on_init
-                - confirm
-                - on_confirm
-                - update
-                - on_update
-                - on_update
-
-              Gold_Loan_Pre_Part_Payment:
-                - search
-                - on_search
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - on_status
-                - status
-                - on_status
-                - init
-                - on_init
-                - confirm
-                - on_confirm
-                - update
-                - on_update
-                - on_update
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
             optional_flows:
-              - Gold_Loan_With_Account_Aggregator
-              - Gold_Loan_Without_Account_Aggregator
-              - Gold_Loan_Foreclosure
-              - Gold_Loan_Missed_EMI
-              - Gold_Loan_Pre_Part_Payment
+              - Gold_Loan_Offline
+              - Gold_Loan_Offline_with_igm_1.0.0
             validationModules: "../validations/ONDC:FIS12/validator#validate"
 
           PERSONAL LOAN:
             flows:
-              Personal_Loan_With_AA_And_Monitoring_Consent:
+              Personal_Loan_Dedupe_Check:
                 - search
                 - on_search
-                - HTML_FORM
                 - select
                 - on_select
-                - select
-                - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - confirm
-                - on_confirm
-                - on_update
-                - update
-                - on_update
-                - status
-                - on_status
-
-              Personal_Loan_Sachet_Insurance_with_AA_And_Monitoring_Consent:
-                - search
-                - on_search
-                - HTML_FORM
-                - select
-                - on_select
-                - select
-                - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - confirm
-                - on_confirm
-                - on_update
-                - update
-                - on_update
-                - status
-                - on_status
-
-              Personal_Loan_Without_AA_And_Monitoring_Consent:
-                - search
-                - on_search
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - confirm
-                - on_confirm
-                - on_update
-                - update
-                - on_update
-                - status
-                - on_status
 
               Personal_Loan_Offline:
                 - search
@@ -4017,147 +3883,203 @@ domains:
                 - HTML_FORM
                 - select
                 - on_select
-                - select
-                - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - init
-                - on_init
-                - confirm
-                - on_confirm
+                - DYNAMIC_FORM
+                - on_status
                 - status
                 - on_status
+                - on_status
+                - confirm
+                - on_confirm
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - on_status
 
-              Personal_Loan_Foreclosure:
+              Personal_Loan_Offline_With_IGM(v-1.0.0):
                 - search
                 - on_search
                 - HTML_FORM
                 - select
                 - on_select
-                - select
-                - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - confirm
-                - on_confirm
+                - DYNAMIC_FORM
                 - on_status
                 - status
                 - on_status
-                - update
-                - on_update
-                - on_update
+                - on_status
+                - confirm
+                - on_confirm
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
 
-              Personal_Loan_Missed_EMI:
+              Personal_Loan_Foreclosure_Offline:
                 - search
                 - on_search
                 - HTML_FORM
                 - select
                 - on_select
-                - select
-                - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - confirm
-                - on_confirm
+                - DYNAMIC_FORM
                 - on_status
                 - status
                 - on_status
+                - on_status
+                - confirm
+                - on_confirm
                 - update
                 - on_update
+                - DYNAMIC_FORM
                 - on_update
 
-              Personal_Loan_Pre_Part_Payment:
+              Personal_Loan_Missed_EMI_Offline:
                 - search
                 - on_search
                 - HTML_FORM
                 - select
                 - on_select
-                - select
-                - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
+                - DYNAMIC_FORM
+                - on_status
+                - status
+                - on_status
+                - on_status
                 - confirm
                 - on_confirm
-                - on_status
                 - update
                 - on_update
+                - DYNAMIC_FORM
                 - on_update
 
-              Personal_Loan_Multiple_Offers:
+              Personal_Loan_Pre_Part_Payment_Offline:
                 - search
                 - on_search
                 - HTML_FORM
                 - select
                 - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - select
-                - on_select
-                - HTML_FORM
-                - select
-                - on_select
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - init
-                - on_init
-                - HTML_FORM
-                - confirm
-                - on_confirm
-                - on_update
-                - update
-                - on_update
+                - DYNAMIC_FORM
+                - on_status
                 - status
                 - on_status
+                - on_status
+                - confirm
+                - on_confirm
+                - update
+                - on_update
+                - DYNAMIC_FORM
+                - on_update
+
+              Personal_Loan_Single_Redirection:
+                - search
+                - on_search
+                - HTML_FORM
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - status
+                - on_status
+                - confirm
+                - on_confirm
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+
+              Personal_Loan_Single_Redirection_With_IGM(v-1.0.0):
+                - search
+                - on_search
+                - HTML_FORM
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - status
+                - on_status
+                - confirm
+                - on_confirm
+                - issue
+                - on_issue
+                - on_issue_status
+                - issue
+
+              Personal_Loan_Foreclosure_Single_Redirection:
+                - search
+                - on_search
+                - HTML_FORM
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - status
+                - on_status
+                - confirm
+                - on_confirm
+                - update
+                - on_update
+                - DYNAMIC_FORM
+                - on_update
+
+              Personal_Loan_Missed_EMI_Single_Redirection:
+                - search
+                - on_search
+                - HTML_FORM
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - status
+                - on_status
+                - confirm
+                - on_confirm
+                - update
+                - on_update
+                - DYNAMIC_FORM
+                - on_update
+
+              Personal_Loan_Pre_Part_Payment_Single_Redirection:
+                - search
+                - on_search
+                - HTML_FORM
+                - select
+                - on_select
+                - on_status
+                - on_status
+                - on_status
+                - on_status
+                - DYNAMIC_FORM
+                - status
+                - on_status
+                - confirm
+                - on_confirm
+                - update
+                - on_update
+                - DYNAMIC_FORM
+                - on_update
             optional_flows:
-              - Personal_Loan_With_AA_And_Monitoring_Consent
-              - Personal_Loan_Sachet_Insurance_with_AA_And_Monitoring_Consent
-              - Personal_Loan_Without_AA_And_Monitoring_Consent
+              - Personal_Loan_Dedupe_Check
               - Personal_Loan_Offline
-              - Personal_Loan_Foreclosure
-              - Personal_Loan_Missed_EMI
-              - Personal_Loan_Pre_Part_Payment
-              - Personal_Loan_Multiple_Offers
+              - Personal_Loan_Offline_With_IGM(v-1.0.0)
+              - Personal_Loan_Foreclosure_Offline
+              - Personal_Loan_Missed_EMI_Offline
+              - Personal_Loan_Pre_Part_Payment_Offline
+              - Personal_Loan_Single_Redirection
+              - Personal_Loan_Single_Redirection_With_IGM(v-1.0.0)
+              - Personal_Loan_Foreclosure_Single_Redirection
+              - Personal_Loan_Missed_EMI_Single_Redirection
+              - Personal_Loan_Pre_Part_Payment_Single_Redirection
             validationModules: "../validations/ONDC:FIS12/validator#validate"
 
           CREDIT CARD:

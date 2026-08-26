@@ -5459,7 +5459,7 @@ function validatePayments(message: any, testResults: TestResult, flow_id?: strin
     }
     if (
       payment.type &&
-      !["PRE_ORDER", "ON_ORDER", "POST_FULFILLMENT"].includes(payment.type)
+      !["PRE_ORDER", "ON_ORDER", "POST_FULFILLMENT","ON_FULFILLMENT"].includes(payment.type)
     ) {
       testResults.failed.push(`Payment ${index} type has invalid value`);
     } else if (payment.type) {
@@ -5493,6 +5493,7 @@ function validatePaymentsTRV10(message: any, testResults: TestResult): void {
         "ON_ORDER",
         "POST_FULFILLMENT",
         "ON-FULFILLMENT",
+        "ON_FULFILLMENT"
       ];
       if (validTypes.includes(payment.type)) {
         testResults.passed.push(`Payment ${index} type has valid value`);
