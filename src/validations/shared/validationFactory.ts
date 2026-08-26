@@ -4436,10 +4436,10 @@ function validateCategoriesFIS12(message: any, testResults: TestResult, flowId?:
       return;
     }
 
-    // if (!validCategoryMap[code]) {
-    //   testResults.failed.push(`Invalid category code: ${code}`);
-    //   return;
-    // }
+    if (!validCategoryMap[code]) {
+      testResults.failed.push(`Invalid category code: ${code}`);
+      return;
+    }
     testResults.passed.push(`Valid category: ${code} - ${name}`);
   });
 }
