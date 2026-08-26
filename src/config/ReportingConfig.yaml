@@ -5311,66 +5311,433 @@ domains:
     versions:
       "2.1.0":
         flows:
-          SIP_Creation_New_Folio:
-            - search
-            - on_search
+          Cart_Lumpsum_Investment_Part_Failure:
+            - select
+            - on_select
+            - HTML_FORM
             - select
             - on_select
             - init
             - on_init
             - confirm
             - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Cart_SIP_Creation:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Cart_SIP_Installment:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Cart_lumpsum_Investment:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Lumpsum_Existing_Folio:
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Lumpsum_New_Folio:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Lumpsum_New_Folio_With_KYC:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - DYNAMIC_FORM
+            - on_status
+            - select
+            - on_select
+            - DYNAMIC_FORM
+            - on_status
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Lumpsum_Payment_By_Buyer_App:
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - update
+            - on_update
+            - on_update
+
+          Lumpsum_Payment_Retry:
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_update
+            - update
+            - on_update
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Main_Search:
+            - search
+            - on_search
+
+          Redemption_By_Amount:
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - on_update
+
+          Redemption_By_Units:
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - on_update
+
+          Redemption_Redeem_All:
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - on_update
+
+          SIP_Auto_Cancellation:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+            - on_update
+
+          SIP_Cancellation_By_The_Investor:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+            - update
+            - on_update
+
+          SIP_Completion:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
             - on_update
 
           SIP_Creation_Existing_Folio:
-            - search
-            - on_search
             - select
             - on_select
             - init
             - on_init
             - confirm
             - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          SIP_Creation_New_Folio:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
             - on_update
 
           SIP_Creation_New_Folio_With_KYC:
-            - search
-            - on_search
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - DYNAMIC_FORM
+            - on_status
+            - select
+            - on_select
+            - DYNAMIC_FORM
+            - on_status
             - select
             - on_select
             - init
             - on_init
             - confirm
             - on_confirm
+            - DYNAMIC_FORM
+            - on_status
             - on_update
 
           SIP_Creation_Without_Payment_Mandate:
-            - search
-            - on_search
             - select
             - on_select
+            - HTML_FORM
             - init
             - on_init
             - confirm
             - on_confirm
-            - on_update
-
-          SIP_Manual_Trigger_Instalment:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
 
           SIP_Instalment:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
             - on_update
 
           SIP_Instalment_Failure:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
             - on_update
+            - on_status
+            - on_update
+
+          SIP_Manual_Trigger_Instalment:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+
+          SIP_Modification_Change_Amount:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+            - update
+            - on_update
+
+          SIP_Modification_Pause:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+            - update
+            - on_update
+
+          SIP_update_new_payment_update:
+            - select
+            - on_select
+            - HTML_FORM
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - update
+            - on_update
+
+          SIP_without_payment_mandate:
+            - select
+            - on_select
+            - HTML_FORM
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+
+          STP_by_amount:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          STP_installment:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          SWP_by_amount:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          SWP_installment:
+            - select
+            - on_select
+            - HTML_FORM
+            - select
+            - on_select
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
+            - on_status
+            - on_update
+
+          Search_Incremental_Pull:
+            - search
+            - on_search
+            - search
+            - on_search
+
+          Switch_by_amount:
+            - select
+            - on_select
+            - HTML_FORM
+            - init
+            - on_init
+            - confirm
+            - on_confirm
+            - DYNAMIC_FORM
 
           SIP_Instalment_Payment_Failure:
             - on_update
@@ -5379,46 +5746,6 @@ domains:
             - on_update
 
           SIP_Instalment_Manual_Payment_And_Mandate:
-            - on_update
-
-          SIP_Cancellation_By_Investor:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-            - on_update
-
-          SIP_Auto_Cancellation:
-            - on_update
-
-          SIP_Modification_Pause:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          SIP_Modification_Change_Amount:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          SIP_Completion:
             - on_update
 
           SIP_Creation_New_Folio_Payment_Failure:
@@ -5435,39 +5762,6 @@ domains:
           SIP_Add_Update_Payment_Mandate:
             - on_update
 
-          Redemption_By_Amount:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          Redemption_Redeem_All:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          Redemption_By_Units:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
           Instant_Redemption_By_Amount:
             - search
             - on_search
@@ -5482,28 +5776,6 @@ domains:
           Redemption_Failure:
             - on_update
 
-          Cart_Lumpsum_Investment:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          Cart_SIP_Creation:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
           Cart_Lumpsum_Plus_SIP:
             - search
             - on_search
@@ -5513,59 +5785,6 @@ domains:
             - on_init
             - confirm
             - on_confirm
-            - on_update
-
-          Cart_Lumpsum_Investment_Part_Failure:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          Cart_SIP_Instalment:
-            - on_update
-
-          Switch_By_Amount:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          STP_By_Amount:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          STP_Instalment:
-            - on_update
-
-          SWP_By_Amount:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          SWP_Instalment:
             - on_update
 
           Other_Services_New_KYC:
@@ -5602,61 +5821,6 @@ domains:
             - search
             - on_search
 
-          Lumpsum_Existing_Folio:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          Lumpsum_New_Folio:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          Lumpsum_New_Folio_With_KYC:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          Lumpsum_Payment_By_Buyer_App:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
-          Lumpsum_Payment_Retry:
-            - search
-            - on_search
-            - select
-            - on_select
-            - init
-            - on_init
-            - confirm
-            - on_confirm
-            - on_update
-
           External_Folio_Lumpsum:
             - search
             - on_search
@@ -5667,56 +5831,51 @@ domains:
             - confirm
             - on_confirm
             - on_update
-
-          Search_Incremental_Pull:
-            - search
-            - on_search
-            - search
-            - on_search
-
         optional_flows:
-          - Search_Incremental_Pull
-          - SIP_Creation_New_Folio
-          - SIP_Creation_Existing_Folio
-          - SIP_Creation_New_Folio_With_KYC
-          - SIP_Creation_Without_Payment_Mandate
-          - SIP_Manual_Trigger_Instalment
-          - SIP_Instalment
-          - SIP_Instalment_Failure
-          - SIP_Instalment_Payment_Failure
-          - SIP_Instalment_Manual_Payment
-          - SIP_Instalment_Manual_Payment_And_Mandate
-          - SIP_Cancellation_By_Investor
-          - SIP_Auto_Cancellation
-          - SIP_Modification_Pause
-          - SIP_Modification_Change_Amount
-          - SIP_Completion
-          - SIP_Creation_New_Folio_Payment_Failure
-          - SIP_Add_Update_Payment_Mandate
-          - Redemption_By_Amount
-          - Redemption_Redeem_All
-          - Redemption_By_Units
-          - Instant_Redemption_By_Amount
-          - Redemption_Failure
-          - Cart_Lumpsum_Investment
-          - Cart_SIP_Creation
-          - Cart_Lumpsum_Plus_SIP
           - Cart_Lumpsum_Investment_Part_Failure
-          - Cart_SIP_Instalment
-          - Switch_By_Amount
-          - STP_By_Amount
-          - STP_Instalment
-          - SWP_By_Amount
-          - SWP_Instalment
-          - Other_Services_New_KYC
-          - Other_Services_Register_Payment_Mandate
-          - Other_Services_Open_Zero_Balance_Folio
-          - Other_Services_Search
+          - Cart_SIP_Creation
+          - Cart_SIP_Installment
+          - Cart_lumpsum_Investment
           - Lumpsum_Existing_Folio
           - Lumpsum_New_Folio
           - Lumpsum_New_Folio_With_KYC
           - Lumpsum_Payment_By_Buyer_App
           - Lumpsum_Payment_Retry
+          - Main_Search
+          - Redemption_By_Amount
+          - Redemption_By_Units
+          - Redemption_Redeem_All
+          - SIP_Auto_Cancellation
+          - SIP_Cancellation_By_The_Investor
+          - SIP_Completion
+          - SIP_Creation_Existing_Folio
+          - SIP_Creation_New_Folio
+          - SIP_Creation_New_Folio_With_KYC
+          - SIP_Creation_Without_Payment_Mandate
+          - SIP_Instalment
+          - SIP_Instalment_Failure
+          - SIP_Manual_Trigger_Instalment
+          - SIP_Modification_Change_Amount
+          - SIP_Modification_Pause
+          - SIP_update_new_payment_update
+          - SIP_without_payment_mandate
+          - STP_by_amount
+          - STP_installment
+          - SWP_by_amount
+          - SWP_installment
+          - Search_Incremental_Pull
+          - Switch_by_amount
+          - SIP_Instalment_Payment_Failure
+          - SIP_Instalment_Manual_Payment
+          - SIP_Instalment_Manual_Payment_And_Mandate
+          - SIP_Creation_New_Folio_Payment_Failure
+          - SIP_Add_Update_Payment_Mandate
+          - Instant_Redemption_By_Amount
+          - Redemption_Failure
+          - Cart_Lumpsum_Plus_SIP
+          - Other_Services_New_KYC
+          - Other_Services_Register_Payment_Mandate
+          - Other_Services_Open_Zero_Balance_Folio
+          - Other_Services_Search
           - External_Folio_Lumpsum
-
         validationModules: "../validations/ONDC:FIS14/validator#validate"
