@@ -1,5 +1,16 @@
 import { TestResult } from "../../types/payload";
 
+// extractBySpec (src/utils/extract.ts) returns [] rather than undefined when a jsonpath query
+// finds nothing (e.g. context.bpp_id on a broadcast `search`, where the BPP is legitimately
+// unknown yet). Treat that — and any other "nothing here" shape — as not present, so a
+// genuinely-absent field doesn't get compared as if it were a real value.
+function normalizeContextField(value: any): string | undefined {
+    if (value === undefined || value === null) return undefined;
+    if (Array.isArray(value)) return value.length ? String(value[0]) : undefined;
+    if (value === "") return undefined;
+    return String(value);
+}
+
 export function validateMfContextConsistency(
     ctx: any,
     priorData: any,
@@ -10,10 +21,15 @@ export function validateMfContextConsistency(
 ): void {
     if (!priorData) return;
 
-    const fields = ["bap_id", "bpp_id", "domain", "version"] as const;
+    // bpp_id is unknown at broadcast `search` time by design — the gateway fans the request out
+    // before any BPP has responded — so it can never legitimately match on_search's bpp_id.
+    // Skip that specific pair instead of comparing "intentionally absent" against "now known".
+    const fields: string[] = priorAction === "search"
+        ? ["bap_id", "domain", "version"]
+        : ["bap_id", "bpp_id", "domain", "version"];
     for (const field of fields) {
-        const current = ctx?.[field];
-        const prior = priorData?.[field];
+        const current = normalizeContextField(ctx?.[field]);
+        const prior = normalizeContextField(priorData?.[field]);
         if (current !== undefined && prior !== undefined && current !== prior) {
             result.failed.push(
                 `[${flowId}] MF-CTX-001: ${field} mismatch between ${currentAction} (${current}) and ${priorAction} (${prior})`
