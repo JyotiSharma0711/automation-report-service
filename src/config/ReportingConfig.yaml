@@ -1639,7 +1639,54 @@ domains:
           - No_Acceptance_SoftUpdate
 
         validationModules: "../validations/ONDC:TRV10/validator#validate"
-  ONDC:FIS10:
+  ONDC:FIS12:SL:
+    versions:
+      "2.3.0":
+        flows:
+          master_search:
+            - search
+             - on_search
+             
+          lamf_credit_line_with_mfc_single_redirection:
+              - search
+              - on_search
+              - select
+              - on_select
+              - on_status
+              - on_status
+              - on_status
+              - on_status
+              - dynamic_form
+              - on_init
+              - journey_offline_form
+              - select
+              - on_select
+              - on_confirm
+            
+          lamf_credit_line_with_mfc_single_redirection._with_igm_1.0.0:
+            - search
+            - on_search
+            - select
+            - on_select
+            - on_status
+            - on_status
+            - on_status
+            - on_status
+            - dynamic_form
+            - on_init
+            - journey_offline_form
+            - select
+            - on_select
+            - on_confirm
+            - issue
+            - on_issue
+            - on_issue_status
+            - issue
+        optional_flows:
+          - lamf_credit_line_with_mfc_offline_journey
+          - lamf_credit_line_with_mfc_single_redirection._with_igm_1.0.0
+        validationModules: "../validations/ONDC:FIS10/validator#validate"
+    ONDC:FIS10:
     versions:
       "2.1.0":
         flows:
