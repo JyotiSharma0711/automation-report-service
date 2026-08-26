@@ -1645,25 +1645,9 @@ domains:
         flows:
           master_search:
             - search
-             - on_search
-             
+            - on_search
+
           lamf_credit_line_with_mfc_single_redirection:
-              - search
-              - on_search
-              - select
-              - on_select
-              - on_status
-              - on_status
-              - on_status
-              - on_status
-              - dynamic_form
-              - on_init
-              - journey_offline_form
-              - select
-              - on_select
-              - on_confirm
-            
-          lamf_credit_line_with_mfc_single_redirection._with_igm_1.0.0:
             - search
             - on_search
             - select
@@ -1672,9 +1656,21 @@ domains:
             - on_status
             - on_status
             - on_status
-            - dynamic_form
-            - on_init
-            - journey_offline_form
+            - DYNAMIC_FORM
+            - select
+            - on_select
+            - on_confirm
+
+          lamf_credit_line_with_mfc_single_redirection_with_igm_1.0.0:
+            - search
+            - on_search
+            - select
+            - on_select
+            - on_status
+            - on_status
+            - on_status
+            - on_status
+            - DYNAMIC_FORM
             - select
             - on_select
             - on_confirm
@@ -1683,10 +1679,11 @@ domains:
             - on_issue_status
             - issue
         optional_flows:
-          - lamf_credit_line_with_mfc_offline_journey
-          - lamf_credit_line_with_mfc_single_redirection._with_igm_1.0.0
-        validationModules: "../validations/ONDC:FIS10/validator#validate"
-    ONDC:FIS10:
+          - master_search
+          - lamf_credit_line_with_mfc_single_redirection
+          - lamf_credit_line_with_mfc_single_redirection_with_igm_1.0.0
+        validationModules: "../validations/ONDC:FIS12:SL/validator#validate"
+  ONDC:FIS10:
     versions:
       "2.1.0":
         flows:
