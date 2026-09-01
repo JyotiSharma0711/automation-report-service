@@ -6392,15 +6392,23 @@ export function createSelectValidator(...config: string[]) {
 
     const transactionId = context?.transaction_id;
 
-    // Validate transaction ID exists for this flow
-    await validateTransactionId(sessionID, flowId, transactionId, testResults);
+    // Register the transaction ID for this flow before validating it.
+    // Flows that start at `select` (e.g. MF redemption flows that skip `search`)
+    // never reach createSearchValidator's addTransactionId call, so the ID is
+    // never stored and every subsequent validator reports a false "No transaction
+    // IDs found" failure. addTransactionId is idempotent — if search already
+    // stored the ID it will not be duplicated.
     if (transactionId) {
       try {
+        await addTransactionId(sessionID, flowId, transactionId);
         await updateApiMap(sessionID, transactionId, action);
       } catch (error: any) {
         testResults.failed.push(`API map update failed: ${error.message}`);
       }
     }
+
+    // Validate transaction ID exists for this flow (will now always find it)
+    await validateTransactionId(sessionID, flowId, transactionId, testResults);
 
     for (const validation of config) {
       if (validation) {
