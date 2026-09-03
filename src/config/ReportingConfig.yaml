@@ -2485,7 +2485,6 @@ domains:
                 - select
                 - on_select
                 - HTML_FORM
-                - on_status
                 - status
                 - on_status
                 - init
@@ -2507,7 +2506,6 @@ domains:
                 - select
                 - on_select
                 - HTML_FORM
-                - on_status
                 - status
                 - on_status
                 - init
@@ -3884,9 +3882,7 @@ domains:
                 - select
                 - on_select
                 - DYNAMIC_FORM
-                - on_status
                 - status
-                - on_status
                 - on_status
                 - confirm
                 - on_confirm
@@ -3903,9 +3899,7 @@ domains:
                 - select
                 - on_select
                 - DYNAMIC_FORM
-                - on_status
                 - status
-                - on_status
                 - on_status
                 - confirm
                 - on_confirm

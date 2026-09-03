@@ -289,8 +289,8 @@ function validateActionSequence(
       if (actualAction !== expectedAction) {
         let foundFutureMatch = false;
         let futureIndex = -1;
-        // Look ahead up to 5 steps
-        for (let k = i + 1; k < Math.min(i + 6, requiredSequence.length); k++) {
+        // Look ahead up to 15 steps
+        for (let k = i + 1; k < Math.min(i + 15, requiredSequence.length); k++) {
           const futureAction = requiredSequence[k]?.toLowerCase();
           // Skip checking against HTML_FORM/DYNAMIC_FORM as jump targets
           if (futureAction === "html_form" || futureAction === "dynamic_form") continue;
@@ -306,6 +306,14 @@ function validateActionSequence(
           logger.info(`Skipping expected steps from index ${i} to ${futureIndex - 1} because actual action '${actualAction}' matches sequence at index ${futureIndex}`);
           i = futureIndex - 1; // Advance loop to just before the matching step (loop will increment i)
           continue; // Continue loop to match current payload against new expected action
+        }
+
+        // Allow mid-flow status/on_status polling after select/on_select or init/on_init
+        if (actualAction === "status" || actualAction === "on_status") {
+          logger.info(`Treating '${actualAction}' at payload position ${payloadIndex + 1} as an allowed mid-flow status check (Expected '${expectedAction}')`);
+          payloadIndex++;
+          i--; // Retry current expected action against the next payload
+          continue;
         }
       }
 

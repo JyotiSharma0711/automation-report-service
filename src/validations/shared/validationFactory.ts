@@ -4429,18 +4429,20 @@ function validateCategoriesFIS12(message: any, testResults: TestResult, flowId?:
             }
 
   categories.forEach((cat) => {
-    const code = cat?.descriptor?.code;
+    const rawCode = cat?.descriptor?.code;
     const name = cat?.descriptor?.name;
 
-    if (!code) {
+    if (!rawCode) {
       return;
     }
 
-    if (!validCategoryMap[code]) {
-      testResults.failed.push(`Invalid category code: ${code}`);
+    const cleanCode = typeof rawCode === "string" ? rawCode.trim().toUpperCase() : rawCode;
+
+    if (!validCategoryMap[cleanCode] && !validCategoryMap[rawCode]) {
+      testResults.failed.push(`Invalid category code: ${rawCode}`);
       return;
     }
-    testResults.passed.push(`Valid category: ${code} - ${name}`);
+    testResults.passed.push(`Valid category: ${rawCode} - ${name}`);
   });
 }
 
@@ -4793,7 +4795,7 @@ function validateUnifiedCreditOnSearchItemsFIS12(
     }
 
     // Descriptor code validation
-    const validCodes = ["LOAN", "CARD", "CREDIT_CARD", "PARENT", "ITEM"];
+    const validCodes = ["LOAN", "PRE_QUALIFIER", "PERSONAL_LOAN", "GOLD_LOAN", "CARD", "CREDIT_CARD", "PARENT", "ITEM"];
     if (!validCodes.includes(item.descriptor.code)) {
       testResults.failed.push(
         `Item ${item.id}: Invalid descriptor.code "${item.descriptor.code}"`
@@ -5459,7 +5461,7 @@ function validatePayments(message: any, testResults: TestResult, flow_id?: strin
     }
     if (
       payment.type &&
-      !["PRE_ORDER", "ON_ORDER", "POST_FULFILLMENT","ON_FULFILLMENT"].includes(payment.type)
+      !["PRE_ORDER", "ON_ORDER", "POST_FULFILLMENT", "ON_FULFILLMENT", "BUYER_FINDER_FEES", "PRE_FULFILLMENT", "POST_ORDER"].includes(payment.type)
     ) {
       testResults.failed.push(`Payment ${index} type has invalid value`);
     } else if (payment.type) {
